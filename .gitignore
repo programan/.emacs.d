@@ -1,0 +1,30 @@
+# Backup directory
+backup/*
+!backups/.gitkeep
+*~
+
+# Data directories
+elpa
+.python-environments/
+games/
+geben/
+url/*
+eshell/
+server/
+image-dired/
+phpactor/
+auto-save-list/
+
+# Data files
+ac-comphist.dat
+tramp
+shellenv.el
+places
+recentf
+projectile-bookmarks.eld
+projectile.cache
+network-security.data
+kkcrc
+
+.mc-lists.el
+
