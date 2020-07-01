@@ -301,8 +301,8 @@
 
 ;; 各OSに依存した設定
 (cond
- ((eq system-type 'windows-nt)
-  (load "~/.emacs.d/init-windows"))
+((eq system-type 'windows-nt)
+ (load "~/.emacs.d/init-windows"))
  ((eq system-type 'darwin)
   (load "~/.emacs.d/init-macos"))
  ((eq system-type 'gnu/linux)

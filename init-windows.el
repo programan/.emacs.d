@@ -42,7 +42,7 @@
 
 (when (eq window-system 'w32)
   ;; 透明度の設定(active . inactive)
-  (add-to-list 'default-frame-alist '(alpha . (95 . 80)))
+  (add-to-list 'default-frame-alist '(alpha . (90 . 80)))
   ;; ツールバーの非表示
   (tool-bar-mode 0))
 
@@ -51,7 +51,7 @@
 
 
 ; 機種依存文字
-(require 'cp5022x)
+;; (require 'cp5022x)
 ; charset と coding-system の優先度設定
 (set-charset-priority 'ascii
                       'japanese-jisx0208
