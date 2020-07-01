@@ -925,7 +925,8 @@ translation it is possible to get suggestion."
          )
   :custom
   ;; (setq imenu-list-focus-after-activation t)
-  ;; (setq imenu-list-auto-resize t)
+  ;; (imenu-list-auto-resize t)
+  (imenu-list-size 0.2)
   (imenu-list-idle-update-delay-time 2)
   )
 
