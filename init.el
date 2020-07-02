@@ -322,12 +322,20 @@
 
 (use-package auto-package-update
   :ensure t
-  :disabled t
+  ;; :disabled t
   :config
-  ;; interval 10days
-  (setq auto-package-update-delete-old-versions t
-        auto-package-update-interval 10)
-  (auto-package-update-maybe))
+  ;; interval 30days
+  (setq auto-package-update-delete-old-versions t)
+  (setq auto-package-update-interval 30)
+  (setq auto-package-update-prompt-before-update t)
+  (auto-package-update-maybe)
+
+  ;; now
+  ;; (add-hook 'auto-package-update-before-hook
+  ;;           (lambda () (message "I will update packages now")))
+  ;; (save-window-excursion
+  ;;   (auto-package-update-now))
+  )
 
 (use-package smooth-scrolling
   :ensure t
@@ -541,9 +549,10 @@ translation it is possible to get suggestion."
   :config
   (require 'skk-study)
   (setq skk-study-sesearch-times 10)
-  :hook
-  (emacs-startup . (lambda () (skk-mode) (skk-latin-mode-on)))
-  (prog-mode . (lambda () (skk-mode) (skk-latin-mode-on)))
+  :hook (
+         (emacs-startup . (lambda () (skk-mode) (skk-latin-mode-on)))
+         (prog-mode . (lambda () (skk-mode) (skk-latin-mode-on)))
+         )
   )
 
 (use-package telephone-line
@@ -888,16 +897,21 @@ translation it is possible to get suggestion."
 
 
 (use-package flycheck-phpstan
+  ;;Phpstan official docker image.
+  ;; https://github.com/emacs-php/phpstan.el
+  ;; docker pull phpstan/phpstan
+  ;; Put the ".dir-locals.el" file on the root directory of project.
+
   :ensure t
   :defer t
-  :config
-  (defun my-php-mode-hook ()
-    "My PHP-mode hook."
-    (require 'flycheck-phpstan)
-    (flycheck-mode t)
-    (flycheck-select-checker 'phpstan))
+  :after (php-mode)
+  ;; :init
+  ;; ;; Always use Docker for PHPStan,
+  ;; (setq-default phpstan-executable 'docker)
 
-  (add-hook 'php-mode-hook 'my-php-mode-hook)
+  :config
+  (flycheck-add-next-checker 'php 'phpstan)
+  ;; (flycheck-select-checker 'phpstan)
   )
 
 (use-package slime
@@ -934,11 +948,12 @@ translation it is possible to get suggestion."
 (use-package rainbow-mode
   :ensure t
   :defer t
-  :hook
-  (css-mode . rainbow-mode)
-  (scss-mode . rainbow-mode)
-  (sass-mode-hook . rainbow-mode)
-  ;; (add-hook 'html-mode-hook 'rainbow-mode)
+  :hook (
+         (css-mode . rainbow-mode)
+         (scss-mode . rainbow-mode)
+         (sass-mode-hook . rainbow-mode)
+         ;; (html-mode-hook .'rainbow-mode)
+         )
   )
 
 (use-package rainbow-delimiters
@@ -955,9 +970,11 @@ translation it is possible to get suggestion."
      (let ((face (intern (format "rainbow-delimiters-depth-%d-face" index))))
        (cl-callf color-saturate-name (face-foreground face) 30))))
 
-  :hook
-  (prog-mode . rainbow-delimiters-mode)
-  (emacs-startup . rainbow-delimiters-using-stronger-colors))
+  :hook (
+         (prog-mode . rainbow-delimiters-mode)
+         (emacs-startup . rainbow-delimiters-using-stronger-colors)
+         )
+  )
 
 
 (use-package highlight-indent-guides
@@ -989,9 +1006,10 @@ translation it is possible to get suggestion."
   ;; (highlight-indent-guides-even-face ((t (:background "dimgray"))))
   (highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))))
 
-  :hook
-  (prog-mode . highlight-indent-guides-mode)
-  (yaml-mode . highlight-indent-guides-mode)
+  :hook (
+         (prog-mode . highlight-indent-guides-mode)
+         (yaml-mode . highlight-indent-guides-mode)
+         )
   )
 
 (use-package ag
@@ -1001,9 +1019,11 @@ translation it is possible to get suggestion."
 (use-package dumb-jump
   :ensure t
   :defer t
-  ;; :hook
-  ;; (prog-mode . dumb-jump-mode)
-  ;; (php-mode . dumb-jump-mode)
+  ;; :hook (
+  ;;        (prog-mode . dumb-jump-mode)
+  ;;        (php-mode . dumb-jump-mode)
+  ;;        )
+
   :custom
   (dumb-jump-selector 'helm)
   (dumb-jump-use-visible-window nil)
@@ -1035,12 +1055,30 @@ translation it is possible to get suggestion."
   (smart-jump-setup-default-registers)
   )
 
-
 (use-package dockerfile-mode
   :ensure t
   :mode
   ("Dockerfile\\'" . dockerfile-mode))
 
+(use-package ac-php
+  ;; php-cliとcscopeが必要
+  ;; Windowsならcscopeはscoopとかchocolateyとかで入れる
+  ;; プロジェクトルートに.ac-php-conf.jsonファイルを作る
+  ;; プロジェクトのソースコードを開き M-x ac-php-remake-tags-all
+  ;; ~/.ac-php内にtagファイルが生成される
+  ;; Windowsの場合は環境変数HOMEに%USERPROFILE%を設定する
+  :ensure t
+  ;; :pin melpa-stable
+  :init
+  (setq ac-php-auto-update-intval 180)
+  :hook
+  (php-mode . ac-php-remake-tags)
+  (projectile-idle-timer . ac-php-remake-tags)
+  )
+
+(use-package company-php
+  :ensure t
+  :after (company))
 
 
 (use-package php-mode
@@ -1054,9 +1092,35 @@ translation it is possible to get suggestion."
   :custom
   (php-manual-url 'ja)
   (php-mode-coding-style 'psr2)
+  (php-search-documentation-browser-function 'eww-browse-url)
+  (php-style-delete-trailing-whitespace 1)
+  :bind (
+         :map php-mode-map
+              ("M-." . ac-php-find-symbol-at-point)
+              ("M-," . ac-php-location-stack-back)
+              )
+  :hook (
+         (php-mode . electric-pair-mode)
+         ;; M-fなどの単語単位の移動をキャメルケース単位にする
+         (php-mode . subword-mode)
+         ;; (php-mode . my-php-flycheck-setup)
+
+         ((php-mode . (lambda ()
+                        (ac-php-core-eldoc-setup) ;; enable eldoc
+                        (set (make-local-variable 'company-backends)
+                             '(;; list of backends
+                               (company-ac-php-backend
+                                company-dabbrev-code
+                                company-capf company-files
+                                )))))
+          ))
   :config
-  ;; M-fなどの単語単位の移動をキャメルケース単位にする
-  (subword-mode 1)
+  ;; (defun my-php-flycheck-setup ()
+  ;;   "My PHP-mode hook."
+  ;;   (require 'flycheck-phpstan)
+  ;;   (flycheck-mode t)
+  ;;   (flycheck-select-checker 'phpstan)
+  ;;   )
   )
 
 (use-package company-phpactor
@@ -1158,7 +1222,7 @@ translation it is possible to get suggestion."
   :custom
   (company-tern-property-marker "")
   :hook
-  (js2-mode-hook . tern-mode) ; 自分が使っているjs用メジャーモードに変える
+  (js2-mode . tern-mode) ; 自分が使っているjs用メジャーモードに変える
   :config
   
   ;; nodeのnpmでternをグローバルにインストールしておく
