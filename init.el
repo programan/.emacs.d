@@ -310,6 +310,16 @@
  )
 
 
+;; ファイルを訪問時のフックからvc-find-file-hookを削除
+;; こいつが有効だと、gitとかcvsとかのディレクトリがある場合に
+;; 再帰的にいろいろ調査しようとして、動きがすごく重たい
+;; ネットワークディレクトリ上のファイルを開くと顕著
+;; gitとかcvsとかの便利機能をemacsで使わないならオフ
+;; ちなみにgitはmagitというlispがある。でもWindowsでは動かないかも
+;; (remove-hook 'find-file-hooks 'vc-find-file-hook)
+(eval-after-load "vc" '(remove-hook 'find-file-hooks 'vc-find-file-hook))
+
+
 ;; packages
 
 (use-package bind-key
