@@ -1250,6 +1250,16 @@ translation it is possible to get suggestion."
   )
 
 
+(use-package geben
+  ;; :pin melpa
+  ;; package-list-packagesでインストールしないと失敗する
+  ;; :ensure t
+  ;; M-x geben
+  ;; portとか変えたい場合は
+  ;; C-u M-x geben
+  )
+
+
 
 ;;; init.el ends here
 
@@ -1263,7 +1273,7 @@ translation it is possible to get suggestion."
  '(mouse-wheel-follow-mouse t)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (5 ((shift) . 1))))
- '(package-selected-packages (quote (use-package)))
+ '(package-selected-packages (quote (geben use-package)))
  '(scroll-step 1)
  '(tron-legacy-theme-dark-fg-bright-comments t)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
