@@ -1161,6 +1161,81 @@ translation it is possible to get suggestion."
   ("\\.yml$" . yaml-mode))
 
 
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (
+         ("\\.md\\'" . gfm-mode)
+         ("\\.mkd\\'" . gfm-mode)
+         ("\\.mdwn\\'" . gfm-mode)
+         ("\\.markdown\\'" . gfm-mode)
+         )
+
+  :config
+  (setq
+   markdown-command "marked"
+   markdown-fontify-code-blocks-natively t
+   markdown-content-type "application/xhtml+xml"
+   ;; markdown-content-type "application/html"
+   markdown-css-paths '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css")
+   markdown-xhtml-header-content "
+<meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css'>
+<style>
+body {
+  box-sizing: border-box;
+  max-width: 768px;
+  width: 100%;
+  margin: 40px auto;
+  padding: 0 10px;
+}
+/*印刷時の改行コード*/
+body>h1:not(:first-of-type) {
+  page-break-before: always;
+}
+h2 {
+  page-break-before: always;
+}
+hr {
+  page-break-before: always;
+}
+/*印刷時のスタイル*/
+@media print {
+  @page {
+    size: A4 landscape;
+    margin-top: 0;
+    margin-bottom: 6mm;
+  }
+  h1 {
+    padding-top: 50mm;
+  }
+  h2 {
+    padding-top: 10mm;
+  }
+  /*hrの直後にh1, h2があった場合は改行コードを付けない*/
+  hr+h1 {
+    page-break-before: auto;
+  }
+  hr+h2 {
+    page-break-before: auto;
+  }
+}
+</style>
+<script src='http://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('markdown-body');
+});
+</script>
+<script>
+hljs.initHighlightingOnLoad();
+</script>
+"))
+
+
+(use-package markdown-toc
+  :ensure t)
+
 (use-package adoc-mode
   :ensure t
   :defer t
