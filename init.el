@@ -1109,10 +1109,11 @@
   :ensure t
   ;; :pin melpa-stable
   :defer t
-  :mode
-  ("\\.php$" . php-mode)
-  ("\\.inc$" . php-mode)
-  ("\\.ctp$" . php-mode)
+  :mode (
+         ("\\.php$" . php-mode)
+         ("\\.inc$" . php-mode)
+         ("\\.ctp$" . php-mode)
+         )
   :custom
   (php-manual-url 'ja)
   (php-mode-coding-style 'psr2)
@@ -1253,27 +1254,29 @@ hljs.initHighlightingOnLoad();
 (use-package adoc-mode
   :ensure t
   :defer t
-  :mode
-  ("\\.adoc$" . adoc-mode)
-  ("\\.asciidoc$" . adoc-mode))
+  :mode (
+         ("\\.adoc$" . adoc-mode)
+         ("\\.asciidoc$" . adoc-mode))
+  )
 
 
 
 (use-package web-mode
   :ensure t
   :defer t
-  :mode
-  ("\\.html\\'" . web-mode)
-  ("\\.xhtml\\'" . web-mode)
-  ("\\.shtml\\'" . web-mode)
-  ("\\.tpl\\'" . web-mode)
-  ("\\.ctp\\'" . web-mode)
-  ("\\.ejs\\'" . web-mode)
-  ("\\.[agj]sp\\'" . web-mode)
-  ("\\.as[cp]x\\'" . web-mode)
-  ("\\.tag\\'" . web-mode)
-  ("\\.tag\\.js\\'" . web-mode)
-  ("\\.vue\\'" . web-mode)
+  :mode (
+         ("\\.html\\'" . web-mode)
+         ("\\.xhtml\\'" . web-mode)
+         ("\\.shtml\\'" . web-mode)
+         ("\\.tpl\\'" . web-mode)
+         ("\\.ctp\\'" . web-mode)
+         ("\\.ejs\\'" . web-mode)
+         ("\\.[agj]sp\\'" . web-mode)
+         ("\\.as[cp]x\\'" . web-mode)
+         ("\\.tag\\'" . web-mode)
+         ("\\.tag\\.js\\'" . web-mode)
+         ("\\.vue\\'" . web-mode)
+         )
   :custom
   ;; web-modeの設定
   (web-mode-markup-indent-offset 4) ;; html indent
@@ -1303,9 +1306,10 @@ hljs.initHighlightingOnLoad();
 (use-package js2-mode
   :ensure t
   :defer t
-  :mode
-  ("\\.js$" . js2-mode)
-  ("\\.json$" . js2-mode)
+  :mode (
+         ("\\.js$" . js2-mode)
+         ("\\.json$" . js2-mode)
+         )
   :hook
   (js2-mode . electric-pair-mode)
   )
