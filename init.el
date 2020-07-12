@@ -334,7 +334,7 @@
   :ensure t
   ;; :disabled t
   :config
-  ;; interval 30days
+  ;; interval 10days
   (setq auto-package-update-delete-old-versions t)
   (setq auto-package-update-interval 30)
   (setq auto-package-update-prompt-before-update t)
@@ -491,8 +491,12 @@
 ;; C-u C-M-tすると、自分で調べたいものを入力できる
 (use-package google-translate
   :ensure t
-  :init
+
+  :config
   (require 'google-translate-default-ui)
+  (defvar google-translate-english-chars "[:ascii:]’“”–"
+    "これらの文字が含まれているときは英語とみなす")
+
   (defun google-translate-enja-or-jaen (&optional string)
     "regionか現在位置の単語を翻訳する。C-u付きでquery指定も可能"
     (interactive)
@@ -503,11 +507,22 @@
                 ((use-region-p)
                  (buffer-substring (region-beginning) (region-end)))
                 (t
-                 (thing-at-point 'word))))
+                 ;; (thing-at-point 'word))))
+
+                 (save-excursion
+                   (let (s)
+                     (forward-char 1)
+                     (backward-sentence)
+                     (setq s (point))
+                     (forward-sentence)
+                     (buffer-substring s (point)))))))
+
     (let* ((asciip (string-match
                     (format "\\`[%s]+\\'" google-translate-english-chars)
                     string)))
       (run-at-time 0.1 nil 'deactivate-mark)
+
+      ;; (message "------!!!!!!!-----!!!!   `%s'..." string)
       (google-translate-translate
        (if asciip "en" "ja")
        (if asciip "ja" "en")
@@ -515,25 +530,24 @@
 
   ;; 2019-05-21
   ;; Fix error of "Failed to search TKK"
-  (defun google-translate--get-b-d1 ()
-    ;; TKK='427110.1469889687'
-    (list 427110 1469889687))
+  ;; (defun google-translate--get-b-d1 ()
+  ;;   ;; TKK='427110.1469889687'
+  ;;   (list 427110 1469889687))
 
   ;; 2020-05-12
   ;; args-out-of-range [] 1
-  (defun google-translate-json-suggestion (json)
-    "Retrieve from JSON (which returns by the
-`google-translate-request' function) suggestion. This function
-does matter when translating misspelled word. So instead of
-translation it is possible to get suggestion."
-    (let ((info (aref json 7)))
-      (if (and info (> (length info) 0))
-          (aref info 1)
-        nil)))
+;;   (defun google-translate-json-suggestion (json)
+;;     "Retrieve from JSON (which returns by the
+;; `google-translate-request' function) suggestion. This function
+;; does matter when translating misspelled word. So instead of
+;; translation it is possible to get suggestion."
+;;     (let ((info (aref json 7)))
+;;       (if (and info (> (length info) 0))
+;;           (aref info 1)
+;;         nil)))
+
   :bind(
         ("C-M-t" . google-translate-enja-or-jaen))
-  :custom
-  (google-translate-english-chars "[:ascii:]" "これらの文字が含まれているときは英語とみなす")
   )
 
 
