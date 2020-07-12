@@ -1084,6 +1084,85 @@
   :mode
   ("Dockerfile\\'" . dockerfile-mode))
 
+
+(use-package ruby-mode
+  ;; :ensure t
+  :mode (
+         ("\\.rb\\'" . ruby-mode)
+         ("\\.Capfile\\'" . ruby-mode)
+         ("\\.Gemfile\\'" . ruby-mode)
+         ("\\.[Rr]akefile\\'" . ruby-mode)
+         )
+  ;; #!/usr/bin/env ruby といった行で始まる、拡張子のないコマンドファイルを適切なモードで開く
+  :interpreter "ruby"
+
+  :custom
+  ;; マジックコメントを自動挿入しない
+  ;; # -*- coding: utf-8 -*-
+  (ruby-insert-encoding-magic-comment nil)
+  ;; ruby-modeのインデント
+  (ruby-indent-level 2)
+  (ruby-indent-tabs-mode nil)
+
+  ;; flycheck
+  (flycheck-check-syntax-automatically '(idle-change mode-enabled new-line save))
+
+  :bind (
+         :map ruby-mode-map
+              ([return] . reindent-then-newline-and-indent)
+              )
+
+  :hook (
+         (ruby-mode . (lambda ()
+                        (when (>= emacs-major-version 24)
+                          (set (make-local-variable 'electric-pair-mode) nil)
+                          (set (make-local-variable 'electric-indent-mode) nil)
+                          (set (make-local-variable 'electric-layout-mode) nil))
+
+                        (flycheck-mode t)
+                        )
+                    )
+         )
+  )
+
+
+(use-package ruby-electric
+  :ensure t
+  :after (ruby-mode)
+  :diminish ruby-electric-mode
+
+  :hook
+  (ruby-mode . (lambda ()
+                 (ruby-electric-mode t)))
+  ;; if に対するendとか入れてくれる
+  ;; emacs24標準のelectricとバッティングするので、ruby-mode時は
+  ;; electric系はオフにする
+  ;; (let ((rel (assq 'ruby-electric-mode minor-mode-map-alist)))
+  ;;   (setq minor-mode-map-alist (append (delete rel minor-mode-map-alist) (list rel))))
+  ;; (setq ruby-electric-expand-delimiters-list nil)
+  )
+
+
+(use-package ruby-block
+  :ensure t
+  :after (ruby-mode)
+  :diminish ruby-block-mode
+  :hook
+  (ruby-mode . ruby-block-mode)
+
+  :custom
+  ;; ミニバッファに表示し, かつ, オーバレイする.
+  (ruby-block-highlight-toggle t)
+  ;; 何もしない
+  ;;(ruby-block-highlight-toggle 'noghing)
+  ;; ミニバッファに表示
+  ;;(ruby-block-highlight-toggle 'minibuffer)
+  ;; オーバレイする
+  ;;(ruby-block-highlight-toggle 'overlay)
+  )
+
+
+
 (use-package ac-php
   ;; php-cliとcscopeが必要
   ;; Windowsならcscopeはscoopとかchocolateyとかで入れる
@@ -1095,9 +1174,10 @@
   ;; :pin melpa-stable
   :init
   (setq ac-php-auto-update-intval 180)
-  :hook
-  (php-mode . ac-php-remake-tags)
-  (projectile-idle-timer . ac-php-remake-tags)
+  :hook (
+         (php-mode . ac-php-remake-tags)
+         (projectile-idle-timer . ac-php-remake-tags)
+         )
   )
 
 (use-package company-php
