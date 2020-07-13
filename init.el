@@ -1161,6 +1161,12 @@
   ;;(ruby-block-highlight-toggle 'overlay)
   )
 
+(use-package inf-ruby
+  :ensure t
+  :custom
+  (inf-ruby-default-implementation "pry")
+  (inf-ruby-eval-binding "Pry.toplevel_binding")
+  )
 
 
 (use-package ac-php
