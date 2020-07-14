@@ -320,6 +320,10 @@
 (eval-after-load "vc" '(remove-hook 'find-file-hooks 'vc-find-file-hook))
 
 
+;; warn when opening files bigger than 200MB
+(setq large-file-warning-threshold 200000000)
+
+
 ;; packages
 
 (use-package bind-key
@@ -653,8 +657,8 @@
   (recentf-max-saved-items 3000)
   (recentf-save-file "~/.emacs.d/recentf")
   (recentf-exclude '("recentf"))
-  (recentf-auto-cleanup 30)
-  ;; (recentf-auto-cleanup 'never)
+  ;; (recentf-auto-cleanup 30)
+  (recentf-auto-cleanup 'never)
   (recentf-auto-save-timer
    (run-with-idle-timer 30 t 'recentf-save-list))
   :config
@@ -665,6 +669,8 @@
 (use-package helm
   :ensure t
   :defer t
+  :diminish helm-mode
+
   :bind (
   ;; ファイル関係(履歴やバッファなどのファイルリスト)
   ("C-;" . helm-for-files)
@@ -727,7 +733,6 @@
 (use-package helm-swoop
   :ensure t
   :defer t
-  :after helm
   :bind (
          ("M-i" . helm-swoop)
          ("M-I" . helm-swoop-back-to-last-point)
@@ -754,32 +759,52 @@
   )
 
 
+(use-package helm-projectile
+  :ensure t
+  :bind (
+         ("C-c s p" . helm-projectile-switch-project))
+  )
+
 (use-package projectile
   :ensure t
-  :after (helm)
   :diminish projectile-mode
 
-  :bind-keymap
-  ("s-p" . projectile-command-map)
-  ("C-c p" . projectile-command-map)
+  :bind-keymap (
+                ("s-p" . projectile-command-map)
+                ("C-c p" . projectile-command-map)
+                )
 
   :custom
   (projectile-completion-system 'helm)
 
+  ;; :config
+  ;; (projectile-mode +1)
+
+  :hook (
+         (prog-mode . projectile-mode)
+         )
   :config
-  (projectile-mode +1))
+  (helm-projectile-on)
+  )
 
 
-(use-package helm-projectile
+(use-package projectile-rails
   :ensure t
-  :defer t
-  :after (projectile helm)
-  :diminish projectile-mode
-  :init
-  ;; :bind (
-  ;;        ("C-c p p" . helm-projectile-switch-project))
-  :config
-  (helm-projectile-on))
+  :diminish projectile-rails-mode
+  :hook (
+         ;; (projectile-mode . projectile-rails-on)
+         (projectile-mode . projectile-rails-mode)
+         )
+  :bind (
+         :map projectile-rails-mode-map
+              ("C-c r" . projectile-rails-command-map)
+         )
+  ;; :custom
+  ;; (projectile-rails-vanilla-command "bin/rails")
+  ;; (projectile-rails-spring-command "bin/spring")
+  ;; (projectile-rails-zeus-command "bin/zeus")
+  )
+
 
 
 (use-package undo-tree
