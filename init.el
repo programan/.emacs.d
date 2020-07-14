@@ -963,6 +963,15 @@
   ;; (flycheck-select-checker 'phpstan)
   )
 
+(use-package sass-mode
+  :ensure t
+  :defer t
+  :mode (
+         ("\\.sass\\'" . sass-mode)
+         ("\\.scss\\'" . sass-mode)
+         )
+  )
+
 (use-package slime
   :ensure t
   :defer t
