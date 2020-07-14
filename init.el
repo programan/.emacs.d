@@ -861,7 +861,8 @@
               ;; C-sで絞り込む
               ("C-s" . company-filter-candidates)
               ;; TABで候補を設定
-              ("C-i" . company-complete-selection)
+              ;; ("C-i" . company-complete-selection)
+              ("TAB" . company-complete-selection)
          :map company-search-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
@@ -1109,8 +1110,8 @@
   ;; :bind
   ;; ([(super d)] . smart-jump-go)
   :config
-  ;; (smart-jump-register :modes '(php-mode))
   (smart-jump-setup-default-registers)
+  ;; (smart-jump-register :modes '(php-mode))
   )
 
 (use-package dockerfile-mode
@@ -1202,6 +1203,21 @@
   (inf-ruby-eval-binding "Pry.toplevel_binding")
   )
 
+(use-package robe
+  :ensure t
+  :hook (
+         (ruby-mode . robe-mode)
+         )
+  :config
+  ;; rvmを利用してrubyのバージョンを管理している場合はこの設定で.rvmrcなどで選択されているrubyを使う
+  ;; (defadvice inf-ruby-console-auto (before activate-rvm-for-robe activate)
+  ;;   (rvm-activate-corresponding-ruby))
+  (advice-add 'inf-ruby-console-auto :before #'rvm-activate-corresponding-ruby)
+
+  ;; companyでrobeの補完を表示
+  (eval-after-load 'company
+    '(push 'company-robe company-backends))
+  )
 
 (use-package ac-php
   ;; php-cliとcscopeが必要
