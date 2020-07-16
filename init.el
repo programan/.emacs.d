@@ -1114,6 +1114,25 @@
   ;; (smart-jump-register :modes '(php-mode))
   )
 
+
+;; Language Server Protocolクライアント
+;; the_silver_searcherかripgrepもOSに入れておく
+;; 使いたい言語のLanguage Serverも別途入れておく
+;; # ruby -> gem install solargraph
+;; solargraph socket --port XXXXXX
+;; サーバー起動し、Emacs側で
+;; C-u M-x eglot
+;; localhost:port_numberで接続
+(use-package eglot
+  :ensure t
+  ;;GNU版を指定しないとproject.elが入り、emacsのbuilt-inのprojectとバッティングしてしまう
+  :pin gnu
+  ;; :hook (
+  ;;        (ruby-mode . eglot-ensure)
+  ;;        )
+  )
+
+
 (use-package dockerfile-mode
   :ensure t
   :mode
@@ -1205,6 +1224,8 @@
 
 (use-package robe
   :ensure t
+  :disabled t
+  :diminish robe-mode
   :hook (
          (ruby-mode . robe-mode)
          )
