@@ -1047,7 +1047,8 @@
   :hook (
          (css-mode . rainbow-mode)
          (scss-mode . rainbow-mode)
-         (sass-mode-hook . rainbow-mode)
+         (sass-mode . rainbow-mode)
+         (web-mode . rainbow-mode)
          ;; (html-mode-hook .'rainbow-mode)
          )
   )
@@ -1470,6 +1471,7 @@ hljs.initHighlightingOnLoad();
          ("\\.tag\\'" . web-mode)
          ("\\.tag\\.js\\'" . web-mode)
          ("\\.vue\\'" . web-mode)
+         ("\\.erb\\'" . web-mode)
          )
   :custom
   ;; web-modeの設定
