@@ -426,7 +426,43 @@
 (use-package volatile-highlights
   :ensure t
   :config
-  (volatile-highlights-mode t))
+  (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move)
+  (vhl/install-extension 'undo-tree)
+
+  (set-face-attribute
+   'vhl/default-face nil :foreground "#008B8B" :background "#757575")
+  (volatile-highlights-mode t)
+
+  ;; ふわっとエフェクトの追加（ペースト時の色 => カーソル色 => 本来色）
+  (defun my:vhl-change-color ()
+    (let
+        ((next 0.2)
+         (reset 0.5)
+         (colors '("#454545" "#262626" "#171717" "#080808" "#030303")))
+      (dolist (color colors)
+        (run-at-time next nil
+                     'set-face-attribute
+                     'vhl/default-face
+                     nil :foreground "#008B8B" :background color)
+        (setq next (+ 0.05 next)))
+      (run-at-time reset nil 'vhl/clear-all))
+    (set-face-attribute 'vhl/default-face
+                        nil :foreground "#008B8B"
+                        :background "#757575"))
+
+  (defun my:yank (&optional ARG)
+    (interactive)
+    (yank ARG)
+    (my:vhl-change-color))
+  (global-set-key (kbd "M-v") 'my:yank)
+  (global-set-key (kbd "C-y") 'my:yank)
+
+  (with-eval-after-load "org"
+    (define-key org-mode-map (kbd "C-y")
+      '(lambda () (interactive)
+         (org-yank)
+         (my:vhl-change-color))))
+  )
 
 
 (use-package whitespace
