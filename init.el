@@ -1500,11 +1500,19 @@ hljs.initHighlightingOnLoad();
   :ensure t
   :defer t
   :mode (
-         ("\\.js$" . js2-mode)
-         ("\\.json$" . js2-mode)
+         ("\\.js\\'" . js2-mode)
+         ("\\.jsx\\'" . js2-jsx-mode)
          )
   :hook
   (js2-mode . electric-pair-mode)
+  )
+
+;; nodeのnpmでjsonlintをグローバルにインストールしておく
+(use-package json-mode
+  :ensure t
+  :mode (
+         ("\\.json\\'" . json-mode)
+         )
   )
 
 (use-package tern
