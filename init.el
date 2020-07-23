@@ -425,6 +425,7 @@
 ;; yank時に一定時間だけハイライトさせる
 (use-package volatile-highlights
   :ensure t
+  :diminish volatile-highlights-mode
   :config
   (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move)
   (vhl/install-extension 'undo-tree)
@@ -690,7 +691,7 @@
   :ensure t
   :defer t
   :custom
-  (recentf-max-saved-items 3000)
+  (recentf-max-saved-items 1000)
   (recentf-save-file "~/.emacs.d/recentf")
   (recentf-exclude '("recentf"))
   ;; (recentf-auto-cleanup 30)
