@@ -340,7 +340,7 @@
   :config
   ;; interval 10days
   (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-interval 30)
+  (setq auto-package-update-interval 10)
   (setq auto-package-update-prompt-before-update t)
   (auto-package-update-maybe)
 
