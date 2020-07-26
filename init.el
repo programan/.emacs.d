@@ -687,19 +687,23 @@
 
 
 ;; recentf
-(use-package recentf-ext
-  :ensure t
-  :defer t
+(use-package recentf
   :custom
   (recentf-max-saved-items 1000)
   (recentf-save-file "~/.emacs.d/recentf")
-  (recentf-exclude '("recentf"))
+  (recentf-exclude '("recentf" "/TAGS$" "/var/tmp/"))
   ;; (recentf-auto-cleanup 30)
   (recentf-auto-cleanup 'never)
+
   (recentf-auto-save-timer
    (run-with-idle-timer 30 t 'recentf-save-list))
   :config
   (recentf-mode 1)
+  )
+
+(use-package recentf-ext
+  :ensure t
+  :after (recentf)
   )
 
 
