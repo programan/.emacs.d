@@ -968,10 +968,10 @@
 
 (use-package flycheck
   :ensure t
-  :bind (
-         ("C-c n" . flycheck-next-error)
-         ("C-c p" . flycheck-previous-error)
-         ("C-c d" . flycheck-list-errors))
+  ;; :bind (
+  ;;        ("C-c n" . flycheck-next-error)
+  ;;        ("C-c p" . flycheck-previous-error)
+  ;;        ("C-c d" . flycheck-list-errors))
   :hook
   ;; (php-mode . (lambda () (setq flycheck-phpcs-standard "PSR2")
   (prog-mode . flycheck-mode)
