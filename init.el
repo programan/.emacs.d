@@ -1166,9 +1166,11 @@
 ;; C-u M-x eglot
 ;; localhost:port_numberで接続
 (use-package eglot
-  :ensure t
-  ;;GNU版を指定しないとproject.elが入り、emacsのbuilt-inのprojectとバッティングしてしまう
-  :pin gnu
+  ;; package-list-packagesでインストールしないと失敗する
+  ;; -> errorは表示されるけどインストールは完了しているかも
+  ;; :ensure t
+  ;; GNU版を指定しないとproject.elが入り、emacsのbuilt-inのprojectとバッティングしてしまう
+  ;; :pin gnu
   ;; :hook (
   ;;        (ruby-mode . eglot-ensure)
   ;;        )
@@ -1181,8 +1183,8 @@
   ("Dockerfile\\'" . dockerfile-mode))
 
 
+;; emacs標準
 (use-package ruby-mode
-  ;; :ensure t
   :mode (
          ("\\.rb\\'" . ruby-mode)
          ("\\.Capfile\\'" . ruby-mode)
@@ -1199,6 +1201,13 @@
   ;; ruby-modeのインデント
   (ruby-indent-level 2)
   (ruby-indent-tabs-mode nil)
+
+  ;;括弧内の深いインデントの制御
+  (ruby-deep-indent-paren-style nil)
+  ;; (ruby-deep-arglist nil)
+
+  ;; 連結されたメソッド呼び出しを揃える
+  (ruby-align-chained-calls t)
 
   ;; flycheck
   (flycheck-check-syntax-automatically '(idle-change mode-enabled new-line save))
@@ -1574,7 +1583,7 @@ hljs.initHighlightingOnLoad();
  '(mouse-wheel-follow-mouse t)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (5 ((shift) . 1))))
- '(package-selected-packages (quote (geben use-package)))
+ '(package-selected-packages (quote (eglot geben use-package)))
  '(scroll-step 1)
  '(tron-legacy-theme-dark-fg-bright-comments t)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
