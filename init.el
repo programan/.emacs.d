@@ -324,6 +324,8 @@
 (setq large-file-warning-threshold 200000000)
 
 
+;;(remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
+
 ;; packages
 
 (use-package bind-key
@@ -888,7 +890,6 @@
 
 (use-package company
   :ensure t
-  :defer t
   :diminish company-mode
   :hook
   ;; プログラミング言語時に有効にする
@@ -902,8 +903,9 @@
               ;; C-sで絞り込む
               ("C-s" . company-filter-candidates)
               ;; TABで候補を設定
-              ;; ("C-i" . company-complete-selection)
-              ("TAB" . company-complete-selection)
+              ;; ([tab] . company-complete-selection)
+              ([tab] . company-indent-or-complete-common)
+              ;; ("C-<tab>" . company-complete)
          :map company-search-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
@@ -915,28 +917,39 @@
   (completion-ignore-case t)
   (company-dabbrev-char-regexp "\\(\\sw\\|\\s_\\|_\\|-\\)")    ; -_を含むものも補完対象とする
 
-  :custom-face
-  ;; 色をauto-completeっぽく
-  (company-tooltip
-   ((t (:foreground "black" :background "lightgrey"))))
-  (company-tooltip-common
-   ((t (:foreground "black" :background "lightgrey"))))
-  (company-tooltip-common-selection
-   ((t (:foreground "white" :background "steelblue"))))
-  (company-tooltip-selection
-   ((t (:foreground "black" :background "steelblue"))))
-  (company-preview-common
-   ((t (:background nil :foreground "lightgrey" :underline t))))
-  (company-scrollbar-fg
-   ((t (:background "orange"))))
-  (company-scrollbar-bg
-   ((t (:background "gray40"))))
-
+  (company-auto-expand t)
+  (company-transformers '(company-sort-by-backend-importance))
+  (company-dabbrev-downcase nil)
 
   :config
   ;; 全バッファで有効にする
   ;; (global-company-mode +1)
+
+  ;; yasnippetとの連携
+  (defvar company-mode/enable-yas t
+    "Enable yasnippet for all backends.")
+  (defun company-mode/backend-with-yas (backend)
+    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+
+  ;; (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+  (setq company-backends (mapcar #'company-mode/backend-with-yas
+                                 '(company-bbdb
+                                   company-eclim
+                                   company-semantic
+                                   company-clang
+                                   company-xcode
+                                   company-cmake
+                                   company-files
+                                   (company-dabbrev-code
+                                    company-gtags
+                                    company-etags
+                                    company-keywords)
+                                   company-oddmuse company-dabbrev company-capf)))
   )
+
 
 (use-package company-quickhelp
   :ensure t
@@ -1161,16 +1174,17 @@
 ;; the_silver_searcherかripgrepもOSに入れておく
 ;; 使いたい言語のLanguage Serverも別途入れておく
 ;; # ruby -> gem install solargraph
-;; solargraph socket --port XXXXXX
+;; solargraph socket --host=0.0.0.0 --port=XXXXXX
 ;; サーバー起動し、Emacs側で
 ;; C-u M-x eglot
 ;; localhost:port_numberで接続
 (use-package eglot
   ;; package-list-packagesでインストールしないと失敗する
   ;; -> errorは表示されるけどインストールは完了しているかも
-  ;; :ensure t
+  :ensure t
   ;; GNU版を指定しないとproject.elが入り、emacsのbuilt-inのprojectとバッティングしてしまう
-  ;; :pin gnu
+  :pin gnu
+  ;; :pin melpa
   ;; :hook (
   ;;        (ruby-mode . eglot-ensure)
   ;;        )
@@ -1583,7 +1597,7 @@ hljs.initHighlightingOnLoad();
  '(mouse-wheel-follow-mouse t)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (5 ((shift) . 1))))
- '(package-selected-packages (quote (eglot geben use-package)))
+ '(package-selected-packages (quote (geben use-package)))
  '(scroll-step 1)
  '(tron-legacy-theme-dark-fg-bright-comments t)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
@@ -1595,13 +1609,6 @@ hljs.initHighlightingOnLoad();
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(company-preview-common ((t (:background nil :foreground "lightgrey" :underline t))))
- '(company-scrollbar-bg ((t (:background "gray40"))))
- '(company-scrollbar-fg ((t (:background "orange"))))
- '(company-tooltip ((t (:foreground "black" :background "lightgrey"))))
- '(company-tooltip-common ((t (:foreground "black" :background "lightgrey"))))
- '(company-tooltip-common-selection ((t (:foreground "white" :background "steelblue"))))
- '(company-tooltip-selection ((t (:foreground "black" :background "steelblue"))))
  '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
  '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
  '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
