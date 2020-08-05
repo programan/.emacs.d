@@ -80,10 +80,6 @@
 ;; モードラインに行数とカラムを表示
 (column-number-mode 1)
 
-;; 矩形モード
-;; C-return
-;; (cua-mode t)
-
 
 ;; バックアップとオートセーブファイルを~/.emacs.d/backups/へ集める
 (add-to-list 'backup-directory-alist (cons "." "~/.emacs.d/backup/"))
@@ -326,6 +322,14 @@
 
 ;;(remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
 
+;; 矩形モード
+;; C-return
+(cua-mode t)
+;; デフォルトキーバインドを無効化
+(setq cua-enable-cua-keys nil)
+
+
+
 ;; packages
 
 (use-package bind-key
@@ -457,7 +461,7 @@
     (interactive)
     (yank ARG)
     (my:vhl-change-color))
-  (global-set-key (kbd "M-v") 'my:yank)
+  ;; (global-set-key (kbd "M-v") 'my:yank)
   (global-set-key (kbd "C-y") 'my:yank)
 
   (with-eval-after-load "org"
