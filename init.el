@@ -1320,11 +1320,18 @@
   ;; :pin melpa-stable
   :init
   (setq ac-php-auto-update-intval 180)
-  :hook (
-         ;; (php-mode . ac-php-remake-tags)
-         ;; (projectile-idle-timer . ac-php-remake-tags)
-         (after-save . ac-php-remake-tags)
-         )
+  ;; :hook (
+  ;;        ;; (php-mode . ac-php-remake-tags)
+  ;;        ;; (projectile-idle-timer . ac-php-remake-tags)
+  ;;        ;; (after-save . ac-php-remake-tags)
+  ;;        )
+  :config
+  (defun remake-ac-php-tags ()
+    "Remake php tags from current buffer"
+    (when (eq major-mode 'php-mode)
+      (ac-php-remake-tags))
+    )
+  (add-hook 'after-save-hook #'remake-ac-php-tags)
   )
 
 (use-package company-php
