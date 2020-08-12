@@ -941,10 +941,10 @@
   ;; (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
   (setq company-backends (mapcar #'company-mode/backend-with-yas
                                  '(company-bbdb
-                                   company-eclim
+                                   ;; company-eclim
                                    company-semantic
                                    company-clang
-                                   company-xcode
+                                   ;; company-xcode
                                    company-cmake
                                    company-files
                                    (company-dabbrev-code
@@ -1321,8 +1321,9 @@
   :init
   (setq ac-php-auto-update-intval 180)
   :hook (
-         (php-mode . ac-php-remake-tags)
-         (projectile-idle-timer . ac-php-remake-tags)
+         ;; (php-mode . ac-php-remake-tags)
+         ;; (projectile-idle-timer . ac-php-remake-tags)
+         (after-save . ac-php-remake-tags)
          )
   )
 
