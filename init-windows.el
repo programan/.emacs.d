@@ -47,7 +47,7 @@
   (tool-bar-mode 0))
 
 ;; フォント
-(add-to-list 'default-frame-alist '(font . "HackGen-11"))
+(add-to-list 'default-frame-alist '(font . "HackGenNerd-11"))
 
 
 ; 機種依存文字
