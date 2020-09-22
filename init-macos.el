@@ -34,7 +34,7 @@
 
 
 ;; フォント設定
-(add-to-list 'default-frame-alist '(font . "HackGen-14"))
+(add-to-list 'default-frame-alist '(font . "HackGenNerd-16"))
 
 
 ;; Macでは¥とバックスラッシュが違う文字列として扱われるため制御する
