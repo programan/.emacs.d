@@ -101,6 +101,7 @@
   ;;                     :foreground "turquoise3")
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (add-hook 'text-mode-hook 'display-line-numbers-mode)
+  (add-hook 'conf-mode-hook 'display-line-numbers-mode)
   )
 
 ;; ファイルの終端をフリンジを使い判り易くする
@@ -380,6 +381,20 @@
 
 (use-package cp5022x
   :ensure t)
+
+(use-package csv-mode
+  ;; C-c C-a 整形
+  ;; C-c C-u 戻す
+  ;; C-c C-k フィールド番号(範囲または任意の番号)
+  ;; C-c C-k 1 2 3
+  ;; C-c C-k 2-4
+  ;; C-c C-z 貼り付け
+  ;; C-c C-t 行入れ替え
+  :ensure t
+  :pin gnu
+  :mode
+  ("\\.csv\\'" . csv-mode)
+  )
 
 ;; 同名ファイルのバッファ名の識別文字列を変更
 (use-package uniquify
@@ -1608,14 +1623,14 @@ hljs.initHighlightingOnLoad();
  '(display-line-numbers-width-start t)
  '(mouse-wheel-follow-mouse t)
  '(mouse-wheel-progressive-speed nil)
- '(mouse-wheel-scroll-amount (quote (5 ((shift) . 1))))
- '(package-selected-packages (quote (geben use-package)))
+ '(mouse-wheel-scroll-amount '(5 ((shift) . 1)))
+ '(package-selected-packages '(geben use-package))
  '(scroll-step 1)
  '(tron-legacy-theme-dark-fg-bright-comments t)
- '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
+ '(uniquify-buffer-name-style 'post-forward-angle-brackets nil (uniquify))
  '(uniquify-min-dir-content 2)
- '(whitespace-display-mappings (quote ((newline-mark 10 [8595 10] [36 10]))))
- '(whitespace-style (quote (face tabs newline newline-mark))))
+ '(whitespace-display-mappings '((newline-mark 10 [8595 10] [36 10])))
+ '(whitespace-style '(face tabs newline newline-mark)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
