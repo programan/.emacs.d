@@ -402,6 +402,18 @@
   (uniquify-buffer-name-style 'post-forward-angle-brackets)
   (uniquify-min-dir-content  2))
 
+(use-package dired
+  :custom
+  ;; 2画面(2つのwindow)でdired使用時に移動(コピー先)をもう1つのdiredにする
+  (dired-dwim-target t)
+  ;; 常にディレクトリは再起コピー
+  (dired-recursive-copies 'always)
+  ;; dired検索時にファイル名だけにマッチ
+  ;; (dired-isearch-filenames t)
+  ;; ファイルリストのオプション(ls -alh)
+  (dired-listing-switches "-alh")
+)
+
 
 (use-package anzu
   :ensure t
@@ -881,6 +893,15 @@
 (use-package all-the-icons
   :ensure t
   )
+
+
+(use-package all-the-icons-dired
+  :ensure t
+  :defer t
+  :hook
+  (dired-mode . all-the-icons-dired-mode)
+  )
+
 
 (use-package neotree
   :ensure t
