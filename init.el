@@ -1610,7 +1610,11 @@ hljs.initHighlightingOnLoad();
   ;; C-u M-x geben
   )
 
-
+(use-package bash-completion
+  :ensure t
+  :init
+  (bash-completion-setup)
+  )
 
 ;;; init.el ends here
 
