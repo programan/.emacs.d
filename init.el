@@ -740,6 +740,12 @@
   )
 
 
+(use-package helm-icons
+  :ensure t
+  :config
+  (helm-icons-enable)
+  )
+
 (use-package helm
   :ensure t
   :defer t
