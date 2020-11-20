@@ -1027,6 +1027,9 @@
 
 (use-package flycheck
   :ensure t
+  :custom
+  ;; ファイル編集後、2秒したらチェック実施
+  (flycheck-idle-change-delay 2)
   ;; :bind (
   ;;        ("C-c n" . flycheck-next-error)
   ;;        ("C-c p" . flycheck-previous-error)
@@ -1317,7 +1320,7 @@
 
 
 (use-package ruby-block
-  :ensure t
+  ;; :ensure t
   :after (ruby-mode)
   :diminish ruby-block-mode
   :hook
