@@ -1136,6 +1136,14 @@
          )
   )
 
+;; 変数ごとの色分け
+(use-package color-identifiers-mode
+  :ensure t
+  :diminish color-identifiers-mode
+  :hook (
+         (prog-mode . color-identifiers-mode)
+         )
+  )
 
 (use-package highlight-indent-guides
   :ensure t
@@ -1612,6 +1620,12 @@ hljs.initHighlightingOnLoad();
          ("\\.js\\'" . js2-mode)
          ("\\.jsx\\'" . js2-jsx-mode)
          )
+  :bind (
+         :map js2-mode-map
+              ("M-." . nil)
+              ("M-," . nil)
+              )
+
   :hook
   (js2-mode . electric-pair-mode)
   )
@@ -1622,6 +1636,18 @@ hljs.initHighlightingOnLoad();
   :mode (
          ("\\.json\\'" . json-mode)
          )
+  )
+
+;; JavaScriptの関数定義ジャンプ
+(use-package xref-js2
+  :ensure t
+  :after (js2-mode)
+  :custom
+  (xref-js2-search-program 'ag)
+  :config
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
   )
 
 (use-package tern
