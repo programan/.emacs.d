@@ -1630,7 +1630,19 @@ hljs.initHighlightingOnLoad();
               ("M-." . nil)
               ("M-," . nil)
               )
+  :custom
+  ;; 関数の引数が複数個ある場合に、改行したら前の引数の位置にインデントを揃える
+  (js-indent-align-list-continuation t)
+  ;; (js-indent-align-list-continuation nil)
+  (js2r-prefered-quote-type 2)
 
+  :config
+  ;; JavaScriptで#付きのメソッドやフィールドがprivateになる対応
+  ;; ECMAScrpt2020
+  ;; patch in basic private field support
+  (advice-add #'js2-identifier-start-p
+              :after-until
+              (lambda (c) (eq c ?#)))
   :hook
   (js2-mode . electric-pair-mode)
   )
