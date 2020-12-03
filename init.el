@@ -568,6 +568,9 @@
 (use-package google-translate
   :ensure t
 
+  :custom
+  (google-translate-backend-method 'curl)
+
   :config
   (require 'google-translate-default-ui)
   (defvar google-translate-english-chars "[:ascii:]’“”–"
@@ -621,6 +624,10 @@
 ;;       (if (and info (> (length info) 0))
 ;;           (aref info 1)
 ;;         nil)))
+
+  ;; 2020-12-04
+  (defun google-translate--search-tkk ()
+    "Search TKK." (list 430675 2721866130))
 
   :bind(
         ("C-M-t" . google-translate-enja-or-jaen))
@@ -1563,7 +1570,6 @@ hljs.initHighlightingOnLoad();
               ("C-c C-r" . nil)
               ("C-c C-o" . nil)
               ("C-c C-d" . nil)
-              ("C-c C-d c" . mermaid-compile)
               ("C-c C-d c" . mermaid-compile)
               ("C-c C-d f" . mermaid-compile-file)
               ("C-c C-d b" . mermaid-compile-buffer)
