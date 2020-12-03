@@ -709,6 +709,12 @@
 
 (use-package git-gutter
   :ensure t
+  :hook (
+         (prog-mode . git-gutter-mode)
+         (text-mode . git-gutter-mode)
+         (conf-mode . git-gutter-mode)
+         )
+
   :custom
   ;; (git-gutter:window-width 2)
   (git-gutter:modified-sign "~")
@@ -724,8 +730,33 @@
   (git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
   (git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
 
-  :config
-  (global-git-gutter-mode +1))
+  ;; :config
+  ;; (global-git-gutter-mode +1)
+  ;; (custom-set-variables
+  ;;  '(git-gutter:disabled-modes '(js2-mode image-mode)))
+  )
+
+;; (use-package git-gutter-fringe
+;;   :ensure t
+;;   :disabled t
+;;   :custom
+;;   ;; (git-gutter:window-width 2)
+;;   (git-gutter:modified-sign "~")
+;;   (git-gutter:added-sign "+")
+;;   (git-gutter:deleted-sign "-")
+
+;;   ;; first character should be a space
+;;   (git-gutter:lighter " GG")
+;;   ;; (git-gutter:update-interval 2)
+
+;;   :custom-face
+;;   (git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
+;;   (git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
+;;   (git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
+
+;;   :config
+;;   (global-git-gutter-mode +1)
+;;   )
 
 
 ;; recentf
@@ -1624,12 +1655,67 @@ hljs.initHighlightingOnLoad();
   (add-hook 'web-mode-hook  'my-web-mode-hook))
 
 
+(use-package tern
+  :ensure t
+  )
+
+(use-package company-tern
+  :ensure t
+  :disabled t
+  :defer t
+  :custom
+  (company-tern-property-marker "")
+  :hook
+  (js2-mode . tern-mode)
+  :config
+
+  ;; nodeのnpmでternをグローバルにインストールしておく
+  ;; M-. 定義ジャンプ
+  ;; M-, 定義ジャンプから戻る
+  ;; C-c C-r 変数名のリネーム
+  ;; C-c C-c 型の取得
+  ;; C-c C-d docsの表示
+  (defun company-tern-depth (candidate)
+    "Return depth attribute for CANDIDATE. 'nil' entries are treated as 0."
+    (let ((depth (get-text-property 0 'depth candidate)))
+      (if (eq depth nil) 0 depth)))
+  (add-to-list 'company-backends 'company-tern) ; backendに追加
+  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
+  )
+
+(use-package linum
+  :custom
+  (linum-format "%4d \u2502 ")
+  )
+
+
+(use-package auto-complete
+  :ensure t
+  :defer t
+  :config
+  ;; (ac-config-default)
+  (ac-linum-workaround)
+  )
+
+(use-package tern-auto-complete
+  :ensure t
+  :disabled t
+  ;; :config
+  ;; (tern-ac-setup)
+  )
+
 (use-package js2-mode
   :ensure t
   :defer t
   :mode (
          ("\\.js\\'" . js2-mode)
          ("\\.jsx\\'" . js2-jsx-mode)
+         )
+  :hook (
+         (js2-mode . linum-mode)
+         (js2-mode . auto-complete-mode)
+         (js2-mode . electric-pair-mode)
+         (js2-mode . tern-mode)
          )
   :bind (
          :map js2-mode-map
@@ -1643,14 +1729,30 @@ hljs.initHighlightingOnLoad();
   (js2r-prefered-quote-type 2)
 
   :config
+  (defun disable-company-mode-js2 ()
+    (company-mode -1))
+  (add-hook 'js2-mode-hook 'disable-company-mode-js2)
+
+  (defun disable-line-numbers-mode-js2 ()
+    (display-line-numbers-mode -1))
+  (add-hook 'js2-mode-hook 'disable-line-numbers-mode-js2)
+
+  (defun disable-git-gutter-mode-js2 ()
+    (git-gutter-mode -1))
+  (add-hook 'js2-mode-hook 'disable-git-gutter-mode-js2)
+
   ;; JavaScriptで#付きのメソッドやフィールドがprivateになる対応
   ;; ECMAScrpt2020
   ;; patch in basic private field support
   (advice-add #'js2-identifier-start-p
               :after-until
               (lambda (c) (eq c ?#)))
-  :hook
-  (js2-mode . electric-pair-mode)
+
+  (eval-after-load 'tern
+    '(progn
+       (require 'tern-auto-complete)
+       (tern-ac-setup)))
+
   )
 
 ;; nodeのnpmでjsonlintをグローバルにインストールしておく
@@ -1671,34 +1773,6 @@ hljs.initHighlightingOnLoad();
   (add-hook 'js2-mode-hook
             (lambda ()
               (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-  )
-
-(use-package tern
-  :ensure t
-  )
-
-(use-package company-tern
-  :ensure t
-  :disabled t
-  :defer t
-  :custom
-  (company-tern-property-marker "")
-  :hook
-  (js2-mode . tern-mode) ; 自分が使っているjs用メジャーモードに変える
-  :config
-  
-  ;; nodeのnpmでternをグローバルにインストールしておく
-  ;; M-. 定義ジャンプ
-  ;; M-, 定義ジャンプから戻る
-  ;; C-c C-r 変数名のリネーム
-  ;; C-c C-c 型の取得
-  ;; C-c C-d docsの表示
-  (defun company-tern-depth (candidate)
-    "Return depth attribute for CANDIDATE. 'nil' entries are treated as 0."
-    (let ((depth (get-text-property 0 'depth candidate)))
-      (if (eq depth nil) 0 depth)))
-  (add-to-list 'company-backends 'company-tern) ; backendに追加
-  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
   )
 
 
