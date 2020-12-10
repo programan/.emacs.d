@@ -298,6 +298,10 @@
 ;; C-h でbackspace
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 
+;; C-x C-<tab>でフレーム切り替え
+(global-set-key (kbd "C-x C-<tab>") 'other-frame)
+
+
 ;; 各OSに依存した設定
 (cond
 ((eq system-type 'windows-nt)
