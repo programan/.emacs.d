@@ -740,28 +740,6 @@
   ;;  '(git-gutter:disabled-modes '(js2-mode image-mode)))
   )
 
-;; (use-package git-gutter-fringe
-;;   :ensure t
-;;   :disabled t
-;;   :custom
-;;   ;; (git-gutter:window-width 2)
-;;   (git-gutter:modified-sign "~")
-;;   (git-gutter:added-sign "+")
-;;   (git-gutter:deleted-sign "-")
-
-;;   ;; first character should be a space
-;;   (git-gutter:lighter " GG")
-;;   ;; (git-gutter:update-interval 2)
-
-;;   :custom-face
-;;   (git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
-;;   (git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
-;;   (git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
-
-;;   :config
-;;   (global-git-gutter-mode +1)
-;;   )
-
 
 ;; recentf
 (use-package recentf
@@ -1498,25 +1476,7 @@
   ;;   )
   )
 
-(use-package company-phpactor
-  :ensure t
-  :disabled t
-  )
 
-(use-package phpactor
-  ;; phpactor-install-or-update
-  :ensure t
-  :disabled t
-  :after (php-mode smart-jump)
-  :hook
-  ((php-mode . (lambda () (set (make-local-variable 'company-backends)
-                               '(;; list of backends
-                                 company-phpactor
-                                 company-files
-                                 )))))
-  :config
-  (phpactor-smart-jump-register)
-  )
 
 
 (use-package yaml-mode
@@ -1680,6 +1640,7 @@ hljs.initHighlightingOnLoad();
 
 (use-package tern
   :ensure t
+  :disabled t
   )
 
 (use-package company-tern
@@ -1720,12 +1681,6 @@ hljs.initHighlightingOnLoad();
   (ac-linum-workaround)
   )
 
-(use-package tern-auto-complete
-  :ensure t
-  :disabled t
-  ;; :config
-  ;; (tern-ac-setup)
-  )
 
 (use-package js2-mode
   :ensure t
@@ -1735,10 +1690,7 @@ hljs.initHighlightingOnLoad();
          ("\\.jsx\\'" . js2-jsx-mode)
          )
   :hook (
-         (js2-mode . linum-mode)
-         (js2-mode . auto-complete-mode)
          (js2-mode . electric-pair-mode)
-         (js2-mode . tern-mode)
          )
   :bind (
          :map js2-mode-map
@@ -1752,30 +1704,12 @@ hljs.initHighlightingOnLoad();
   (js2r-prefered-quote-type 2)
 
   :config
-  (defun disable-company-mode-js2 ()
-    (company-mode -1))
-  (add-hook 'js2-mode-hook 'disable-company-mode-js2)
-
-  (defun disable-line-numbers-mode-js2 ()
-    (display-line-numbers-mode -1))
-  (add-hook 'js2-mode-hook 'disable-line-numbers-mode-js2)
-
-  (defun disable-git-gutter-mode-js2 ()
-    (git-gutter-mode -1))
-  (add-hook 'js2-mode-hook 'disable-git-gutter-mode-js2)
-
   ;; JavaScriptで#付きのメソッドやフィールドがprivateになる対応
   ;; ECMAScrpt2020
   ;; patch in basic private field support
   (advice-add #'js2-identifier-start-p
               :after-until
               (lambda (c) (eq c ?#)))
-
-  (eval-after-load 'tern
-    '(progn
-       (require 'tern-auto-complete)
-       (tern-ac-setup)))
-
   )
 
 ;; nodeのnpmでjsonlintをグローバルにインストールしておく
@@ -1796,6 +1730,27 @@ hljs.initHighlightingOnLoad();
   (add-hook 'js2-mode-hook
             (lambda ()
               (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+  )
+
+
+;; https://emacs-lsp.github.io/lsp-mode/page/installation/
+(use-package lsp-mode
+  :ensure t
+  :hook(
+        ;; npm i -g typescript-language-server; npm i -g typescript
+        (js2-mode . lsp)
+        )
+  :commands (lsp lsp-deferred)
+  )
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  )
+
+(use-package helm-lsp
+  :ensure t
+  :commands helm-lsp-workspace-symbol
   )
 
 
