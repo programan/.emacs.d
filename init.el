@@ -781,10 +781,60 @@
   ;; C-c C-i：ポイントでのresclient変数に関する情報を表示する
   )
 
-(use-package helm-icons
+
+;; Install fonts file after install package.
+;; M-x all-the-icons-install-fonts
+(use-package all-the-icons
   :ensure t
+  )
+
+
+(use-package all-the-icons-dired
+  :ensure t
+  :defer t
+  :hook
+  (dired-mode . all-the-icons-dired-mode)
+  )
+
+
+(use-package projectile
+  :ensure t
+  :diminish projectile-mode
+
+  :bind-keymap (
+                ("s-p" . projectile-command-map)
+                ("C-c p" . projectile-command-map)
+                )
+
+  :custom
+  (projectile-completion-system 'helm)
+
+  ;; :config
+  ;; (projectile-mode +1)
+
+  :hook (
+         (prog-mode . projectile-mode)
+         )
   :config
-  (helm-icons-enable)
+  (helm-projectile-on)
+  )
+
+
+(use-package projectile-rails
+  :ensure t
+  :diminish projectile-rails-mode
+  :hook (
+         ;; (projectile-mode . projectile-rails-on)
+         (projectile-mode . projectile-rails-mode)
+         )
+  :bind (
+         :map projectile-rails-mode-map
+              ("C-c r" . projectile-rails-command-map)
+         )
+  ;; :custom
+  ;; (projectile-rails-vanilla-command "bin/rails")
+  ;; (projectile-rails-spring-command "bin/spring")
+  ;; (projectile-rails-zeus-command "bin/zeus")
   )
 
 (use-package helm
@@ -881,51 +931,18 @@
 
 
 (use-package helm-projectile
+  :after projectile
   :ensure t
   :bind (
          ("C-c s p" . helm-projectile-switch-project))
   )
 
-(use-package projectile
+(use-package helm-icons
+  ;; :after treemacs
   :ensure t
-  :diminish projectile-mode
-
-  :bind-keymap (
-                ("s-p" . projectile-command-map)
-                ("C-c p" . projectile-command-map)
-                )
-
-  :custom
-  (projectile-completion-system 'helm)
-
-  ;; :config
-  ;; (projectile-mode +1)
-
-  :hook (
-         (prog-mode . projectile-mode)
-         )
   :config
-  (helm-projectile-on)
+  (helm-icons-enable)
   )
-
-
-(use-package projectile-rails
-  :ensure t
-  :diminish projectile-rails-mode
-  :hook (
-         ;; (projectile-mode . projectile-rails-on)
-         (projectile-mode . projectile-rails-mode)
-         )
-  :bind (
-         :map projectile-rails-mode-map
-              ("C-c r" . projectile-rails-command-map)
-         )
-  ;; :custom
-  ;; (projectile-rails-vanilla-command "bin/rails")
-  ;; (projectile-rails-spring-command "bin/spring")
-  ;; (projectile-rails-zeus-command "bin/zeus")
-  )
-
 
 
 (use-package undo-tree
@@ -933,21 +950,6 @@
   :diminish undo-tree-mode "UndoT"
   :config
   (global-undo-tree-mode t))
-
-
-;; Install fonts file after install package.
-;; M-x all-the-icons-install-fonts
-(use-package all-the-icons
-  :ensure t
-  )
-
-
-(use-package all-the-icons-dired
-  :ensure t
-  :defer t
-  :hook
-  (dired-mode . all-the-icons-dired-mode)
-  )
 
 
 (use-package neotree
