@@ -1260,16 +1260,6 @@
   ;; (global-set-key (kbd "S-,") 'dumb-jump-back)
   )
 
-(use-package smart-jump
-  :ensure t
-  ;; :bind
-  ;; ([(super d)] . smart-jump-go)
-  :config
-  (smart-jump-setup-default-registers)
-  ;; (smart-jump-register :modes '(php-mode))
-  )
-
-
 ;; Language Server Protocolクライアント
 ;; the_silver_searcherかripgrepもOSに入れておく
 ;; 使いたい言語のLanguage Serverも別途入れておく
@@ -1639,35 +1629,6 @@ hljs.initHighlightingOnLoad();
     )
   (add-hook 'web-mode-hook  'my-web-mode-hook))
 
-
-(use-package tern
-  :ensure t
-  :disabled t
-  )
-
-(use-package company-tern
-  :ensure t
-  :disabled t
-  :defer t
-  :custom
-  (company-tern-property-marker "")
-  :hook
-  (js2-mode . tern-mode)
-  :config
-
-  ;; nodeのnpmでternをグローバルにインストールしておく
-  ;; M-. 定義ジャンプ
-  ;; M-, 定義ジャンプから戻る
-  ;; C-c C-r 変数名のリネーム
-  ;; C-c C-c 型の取得
-  ;; C-c C-d docsの表示
-  (defun company-tern-depth (candidate)
-    "Return depth attribute for CANDIDATE. 'nil' entries are treated as 0."
-    (let ((depth (get-text-property 0 'depth candidate)))
-      (if (eq depth nil) 0 depth)))
-  (add-to-list 'company-backends 'company-tern) ; backendに追加
-  (add-to-list 'company-backends '(company-tern :with company-dabbrev-code))
-  )
 
 (use-package linum
   :custom
