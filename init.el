@@ -647,6 +647,17 @@
   )
 
 
+(use-package ag
+  :ensure t
+  )
+
+(use-package bash-completion
+  :ensure t
+  :init
+  (bash-completion-setup)
+  )
+
+
 ;; ddskk
 (use-package ddskk
   :ensure t
@@ -815,8 +826,6 @@
   :hook (
          (prog-mode . projectile-mode)
          )
-  :config
-  (helm-projectile-on)
   )
 
 
@@ -935,6 +944,8 @@
   :ensure t
   :bind (
          ("C-c s p" . helm-projectile-switch-project))
+  :config
+  (helm-projectile-on)
   )
 
 (use-package helm-icons
@@ -976,6 +987,10 @@
   (neo-autorefresh t)
   )
 
+(use-package dockerfile-mode
+  :ensure t
+  :mode
+  ("Dockerfile\\'" . dockerfile-mode))
 
 (use-package company
   :ensure t
@@ -1226,10 +1241,6 @@
          )
   )
 
-(use-package ag
-  :ensure t
-  )
-
 (use-package dumb-jump
   :ensure t
   :defer t
@@ -1279,12 +1290,6 @@
   ;;        (ruby-mode . eglot-ensure)
   ;;        )
   )
-
-
-(use-package dockerfile-mode
-  :ensure t
-  :mode
-  ("Dockerfile\\'" . dockerfile-mode))
 
 
 ;; emacs標準
@@ -1724,12 +1729,6 @@ hljs.initHighlightingOnLoad();
   ;; M-x geben
   ;; portとか変えたい場合は
   ;; C-u M-x geben
-  )
-
-(use-package bash-completion
-  :ensure t
-  :init
-  (bash-completion-setup)
   )
 
 ;;; init.el ends here
