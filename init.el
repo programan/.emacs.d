@@ -35,10 +35,10 @@
     ;; use-packageのインストール
     (package-install 'use-package))
 
-  (setq use-package-enable-imenu-support t)
+  (custom-set-variables '(use-package-enable-imenu-support t))
   ;; (setq use-package-always-ensure t)
   ;; M-x use-package-report
-  (setq use-package-compute-statistics t))
+  (defvar use-package-compute-statistics t))
 
 (eval-when-compile
   (require 'use-package))
@@ -200,7 +200,7 @@
      ()))
   "*Face used by hl-line.")
 
-(setq hl-line-face 'hlline-face)
+(defvar hl-line-face 'hlline-face)
 ;; (setq hl-line-face 'underline) ; 下線
 (global-hl-line-mode)
 
@@ -320,7 +320,7 @@
 ;; gitとかcvsとかの便利機能をemacsで使わないならオフ
 ;; ちなみにgitはmagitというlispがある。でもWindowsでは動かないかも
 ;; (remove-hook 'find-file-hooks 'vc-find-file-hook)
-(eval-after-load "vc" '(remove-hook 'find-file-hooks 'vc-find-file-hook))
+(eval-after-load "vc" '(remove-hook 'find-file-hook 'vc-find-file-hook))
 
 
 ;; warn when opening files bigger than 200MB
@@ -1244,10 +1244,11 @@
 (use-package dumb-jump
   :ensure t
   :defer t
-  ;; :hook (
+  :hook (
+         (xref-backend-functions . dumb-jump-xref-activate)
   ;;        (prog-mode . dumb-jump-mode)
   ;;        (php-mode . dumb-jump-mode)
-  ;;        )
+         )
 
   :custom
   (dumb-jump-selector 'helm)
@@ -1256,11 +1257,11 @@
   (dumb-jump-default-project "")
   (dumb-jump-force-searcher 'ag)
 
-  :config
-  ;; C-M-g jump
-  ;; C-M-p back
-  ;; C-M-q
-  (dumb-jump-mode)
+  ;; :config
+  ;;;; C-M-g jump
+  ;;;; C-M-p back
+  ;;;; C-M-q
+  ;; (dumb-jump-mode)
 
   ;; :bind
   ;; (define-key global-map [(super .)] 'dumb-jump-go)
