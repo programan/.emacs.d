@@ -1621,6 +1621,13 @@ hljs.initHighlightingOnLoad();
   )
 
 
+(use-package typescript-mode
+  :ensure t
+  :mode (
+         ("\\.ts\\'" . typescript-mode)
+         )
+  )
+
 (use-package python-mode
   :ensure t
   :mode (
@@ -1652,6 +1659,7 @@ hljs.initHighlightingOnLoad();
   :hook(
         ;; npm i -g typescript-language-server; npm i -g typescript
         (js2-mode . lsp)
+        (typescript-mode . lsp)
         ;; npm i -g lsp-pyright
         (python-mode . lsp)
         )
