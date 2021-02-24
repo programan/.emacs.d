@@ -1637,6 +1637,11 @@ hljs.initHighlightingOnLoad();
   (python-indent 4)
   (tab-width 4)
   (indent-tabs-mode nil)
+
+  :hook (
+         (python-mode . electric-pair-mode)
+         ;; (python-mode . flymake-python-pyflakes-load)
+         )
   )
 
 
@@ -1694,6 +1699,7 @@ hljs.initHighlightingOnLoad();
 ;; npm i -g lsp-pyright
 (use-package lsp-pyright
   :ensure t
+  :after python-mode
   :init
   (defun lsp-pyright/python-mode-hook
     ()
@@ -1702,6 +1708,13 @@ hljs.initHighlightingOnLoad();
       ;; LSPで構文チェック
       ;; python3.5から導入されたmypyをオフ
       (setq flycheck-disabled-checkers '(python-mypy))
+      ;; flake8を使う
+      ;; (custom-set-variables
+      ;;  '(flycheck-python-flake8-executable "python3")
+      ;;  '(flycheck-python-pycompile-executable "python3")
+      ;;  '(flycheck-python-pylint-executable "python3"))
+      ;; (defvaralias 'flycheck-python-flake8-executable 'python-shell-interpreter)
+      ;; (setq flycheck-python-flake8-executable "flake8")
       )
     )
 
@@ -1719,6 +1732,10 @@ hljs.initHighlightingOnLoad();
 
 (use-package auto-virtualenvwrapper
   :ensure t
+  :hook (
+         ;; 自動で.venvのライブラリを使用
+         (python-mode . auto-virtualenvwrapper-activate)
+         )
   )
 
 (use-package geben
