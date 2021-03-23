@@ -31,3 +31,4 @@ kkcrc
 .mc-lists.el
 
 .lsp-session*
+.lsp-eslint-choices
