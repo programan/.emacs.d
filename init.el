@@ -336,6 +336,43 @@
 (setq cua-enable-cua-keys nil)
 
 
+;; Org modeの設定
+;; org-modeでMarkdownのexportを有効にする
+(eval-after-load "org"
+  '(require 'ox-md nil t))
+
+;; org-modeのタスク状態の遷移
+(setq org-todo-keywords
+      '((sequence "TODO" "SOMEDAY" "WAITING" "|" "DONE")))
+(setq org-log-done 'time)
+
+;; メモファイルの場所
+(setq org-directory "~/Org")
+(setq org-default-notes-file "notes.org")
+
+;; Org-captureを呼び出し
+(define-key global-map "\C-cc" 'org-capture)
+;; Org-captureのテンプレートの設定
+(setq org-capture-templates
+      '(("n" "Note" entry (file+headline "~/Org/notes.org" "Notes")
+         "* %?\nEntered on %U\n %i\n %a")
+        ))
+
+;; captureで書いたメモを見る設定
+(defun show-org-buffer (file)
+  "Show an org-file FILE on the current buffer."
+  (interactive)
+  (if (get-buffer file)
+      (let ((buffer (get-buffer file)))
+        (switch-to-buffer buffer)
+        (message "%s" file))
+    (find-file (concat "~/Org/" file))))
+(global-set-key (kbd "C-M-^") '(lambda () (interactive)
+                                 (show-org-buffer "notes.org")))
+
+;; 長い文章を折り返す
+;; (setq org-startup-truncated nil)
+
 
 ;; packages
 
@@ -1424,7 +1461,12 @@
          ("\\.mdwn\\'" . gfm-mode)
          ("\\.markdown\\'" . gfm-mode)
          )
-
+  ;; デフォルトでtabは見出しの折り畳みのトグルq
+  ;; (bind-keys :map markdown-mode-map
+  ;;            ("<Tab>" . markdown-cycle)
+  ;;            ("<S-tab>" . markdown-shifttab)
+  ;;            ("C-M-n" . outline-next-visible-heading)
+  ;;            ("C-M-p" . outline-previous-visible-heading))
   :config
   (setq
    markdown-command "marked"
@@ -1735,6 +1777,14 @@ hljs.initHighlightingOnLoad();
   :hook (
          ;; 自動で.venvのライブラリを使用
          (python-mode . auto-virtualenvwrapper-activate)
+         )
+  )
+
+
+(use-package org-bullets
+  :ensure t
+  :hook (
+         (org-mode . org-bullets-mode)
          )
   )
 

@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: currentdate
+# key: dd
+# --
+* `(format-time-string "%Y-%m-%d")`
+
