@@ -336,43 +336,6 @@
 (setq cua-enable-cua-keys nil)
 
 
-;; Org modeの設定
-;; org-modeでMarkdownのexportを有効にする
-(eval-after-load "org"
-  '(require 'ox-md nil t))
-
-;; org-modeのタスク状態の遷移
-(setq org-todo-keywords
-      '((sequence "TODO" "SOMEDAY" "WAITING" "|" "DONE")))
-(setq org-log-done 'time)
-
-;; メモファイルの場所
-(setq org-directory "~/Org")
-(setq org-default-notes-file "notes.org")
-
-;; Org-captureを呼び出し
-(define-key global-map "\C-cc" 'org-capture)
-;; Org-captureのテンプレートの設定
-(setq org-capture-templates
-      '(("n" "Note" entry (file+headline "~/Org/notes.org" "Notes")
-         "* %?\nEntered on %U\n %i\n %a")
-        ))
-
-;; captureで書いたメモを見る設定
-(defun show-org-buffer (file)
-  "Show an org-file FILE on the current buffer."
-  (interactive)
-  (if (get-buffer file)
-      (let ((buffer (get-buffer file)))
-        (switch-to-buffer buffer)
-        (message "%s" file))
-    (find-file (concat "~/Org/" file))))
-(global-set-key (kbd "C-M-^") '(lambda () (interactive)
-                                 (show-org-buffer "notes.org")))
-
-;; 長い文章を折り返す
-;; (setq org-startup-truncated nil)
-
 
 ;; packages
 
@@ -1780,6 +1743,58 @@ hljs.initHighlightingOnLoad();
          )
   )
 
+
+(use-package org
+  :mode (
+         ("\\.org$" . org-mode)
+         )
+  :bind (
+         ("C-c c" . org-capture)
+         ("C-c l" . org-store-link)
+         ("C-c a" . org-agenda)
+         ("C-c b" . org-iswitchb)
+         )
+  :custom
+  ;; org-modeのタスク状態の遷移
+  (org-todo-keywords '((sequence "TODO" "SOMEDAY" "WAITING" "|" "DONE" "CANCELED")))
+  ;; タスク状態をDONEにした場合に時刻を挿入
+  (org-log-done 'time)
+  ;; メモファイルの場所
+  (org-directory "~/Org")
+  (org-default-notes-file "notes.org")
+  ;; TODOリストで、子リストをDONEにしないと親をDONEにできない
+  (org-enforce-todo-dependencies t)
+  (org-agenda-files '("~/Org/gtd.org"
+                      ;; "~/Org/project.org"
+                      ))
+  ;; Org-captureのテンプレートの設定
+  ;; TODOはC-c C-dで締切入力、C-c C-sで作業予定日入力
+  (org-capture-templates
+   '(("t" "Todo" entry (file+headline "~/Org/gtd.org" "INBOX")
+      "* TODO %?\n %i\n %a")
+     ("n" "Note" entry (file+headline "~/Org/notes.org" "Notes")
+      "* %U %?\n%i\n %a")
+     ))
+
+  ;; 長い文章を折り返す
+  ;; (org-startup-truncated nil)
+
+  :config
+  ;; captureで書いたメモを見る設定
+  (defun show-org-buffer (file)
+    "Show an org-file FILE on the current buffer."
+    (interactive)
+    (if (get-buffer file)
+        (let ((buffer (get-buffer file)))
+          (switch-to-buffer buffer)
+          (message "%s" file))
+      (find-file (concat "~/Org/" file))))
+  (global-set-key (kbd "C-M-^") '(lambda () (interactive)
+                                   (show-org-buffer "notes.org")))
+
+  ;; org-modeでMarkdownのexportを有効にする
+  (require 'ox-md nil t)
+  )
 
 (use-package org-bullets
   :ensure t
