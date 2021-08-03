@@ -634,7 +634,7 @@
     "Search TKK." (list 430675 2721866130))
 
   :bind(
-        ("C-M-t" . google-translate-enja-or-jaen))
+        ("C-M-g t" . google-translate-enja-or-jaen))
   )
 
 
@@ -1779,6 +1779,38 @@ hljs.initHighlightingOnLoad();
   ;; 長い文章を折り返す
   ;; (org-startup-truncated nil)
 
+  ;; 勝手に入力される \hypersetup{} は使わない(usepackage の順序依存に配慮)
+  (org-latex-with-hyperref nil)
+
+  (org-latex-pdf-process
+   '("platex -shell-escape %f"
+     "platex -shell-escape %f"
+     "pbibtex %b"
+     "platex -shell-escape %f"
+     "platex -shell-escape %f"
+     "dvipdfmx %b.dvi"))
+
+  (org-latex-title-command "\\maketitle")
+  (org-latex-toc-command
+   "\\tableofcontents\n")
+  (org-latex-text-markup-alist '((bold . "\\textbf{%s}")
+                                 (code . verb)
+                                 (italic . "\\it{%s}")
+                                 (strike-through . "\\sout{%s}")
+                                 (underline . "\\uline{%s}")
+                                 (verbatim . protectedtexttt)))
+
+  (org-export-latex-listings t)
+  (org-latex-listings 'minted)
+  (org-latex-minted-options
+   '(("frame" "lines")
+     ("framesep=2mm")
+     ("linenos=true")
+     ("baselinestretch=1.2")
+     ("fontsize=\\footnotesize")
+     ("breaklines")
+     ))
+
   :config
   ;; captureで書いたメモを見る設定
   (defun show-org-buffer (file)
@@ -1791,6 +1823,40 @@ hljs.initHighlightingOnLoad();
       (find-file (concat "~/Org/" file))))
   (global-set-key (kbd "C-M-^") '(lambda () (interactive)
                                    (show-org-buffer "notes.org")))
+
+  (add-to-list 'org-latex-packages-alist "\\hypersetup{setpagesize=false}" t)
+  (add-to-list 'org-latex-packages-alist "\\hypersetup{colorlinks=true}" t)
+  (add-to-list 'org-latex-packages-alist "\\hypersetup{linkcolor=blue}" t)
+
+  (require 'ox-latex)
+  ;; インデントすると *.tex にそのまま入ってしまう
+  (with-eval-after-load 'ox-latex
+    (add-to-list 'org-latex-classes
+                 '("myjsarticle"
+                   "\\documentclass[uplatex,dvipdfmx,12pt]{jsarticle}
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsfonts}
+\\usepackage{amsmath}
+% \\usepackage{newtxtext,newtxmath}
+\\usepackage[normalem]{ulem}
+\\usepackage{textcomp}
+\\usepackage{minted}
+\\usemintedstyle{emacs}
+\\usepackage[dvipdfmx]{graphicx}
+\\usepackage[dvipdfmx]{color}
+\\usepackage{booktabs}
+\\usepackage{longtable}
+\\usepackage{wrapfig}
+\\usepackage[dvipdfmx]{hyperref}
+\\usepackage{pxjahyper}
+% \\hypersetup{pdfencoding=auto}"
+  ("\\section{%s}" . "\\section*{%s}")
+  ("\\subsection{%s}" . "\\subsection*{%s}")
+  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+
 
   ;; org-modeでMarkdownのexportを有効にする
   (require 'ox-md nil t)
