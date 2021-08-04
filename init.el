@@ -280,8 +280,8 @@
   (interactive)
   (setq-local eww-disable-colorize nil)
   (eww-reload))
-(setq eww-search-prefix "http://www.google.co.jp/search?q=")
-
+;; (setq eww-search-prefix "http://www.google.co.jp/search?q=")
+(setq eww-search-prefix "https://www.google.com/search?&gws_rd=cr&complete=0&pws=0&tbs=li:1&q=")
 
 ;; ショートカットキー設定
 ;; M-g で指定行へ移動
