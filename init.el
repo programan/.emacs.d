@@ -808,6 +808,32 @@
   )
 
 
+(use-package counsel
+  :ensure t
+  :pin melpa
+  :bind (
+         ("C-x C-f" . counsel-find-file)
+         ("M-x" . counsel-M-x)
+         ("M-y" . counsel-yank-pop)
+         ("C-c b" . counsel-descbinds)
+         ;; ディレクトリも再起的に検索するには、C-uを最初に打つ
+         ("C-c g" . counsel-ag)
+         :map counsel-find-file-map
+         ("C-l" . counsel-up-directory)
+         )
+  :config
+  (counsel-mode 1)
+  )
+
+(use-package swiper
+  :ensure t
+  :pin melpa
+  ;; :bind (
+  ;;        ("C-s" . swiper-isearch)
+  ;;        )
+  )
+
+
 (use-package ivy
   :ensure t
   :pin melpa
@@ -816,12 +842,13 @@
   (ivy-wrap t)
   ;; プロンプトの表示が長い時に折り返す（選択候補も折り返される）
   (ivy-truncate-lines nil)
-  ;; `ivy-switch-buffer' のリストに recent files と bookmark を含める
+  ;; ivy-switch-buffer のリストに recent files と bookmark を含める
   (ivy-use-virtual-buffers t)
+  ;; ivy-switch-buffer のリストにパスも含めて表示(同名ファイルで別ディレクトリも分けて表示)
+  (ivy-virtual-abbreviate 'full)
   ;; ミニバッファのサイズ
-  (ivy-height 25)
+  (ivy-height 20)
   (ivy-count-format "(%d/%d) ")
-
 
   :bind (
          ("C-;" . ivy-switch-buffer)
@@ -842,29 +869,6 @@
   :custom
   ;; M-o を ivy-hydra-read-action に割り当てる．
   (ivy-read-action-function #'ivy-hydra-read-action)
-  )
-
-(use-package swiper
-  :ensure t
-  :pin melpa
-  ;; :bind (
-  ;;        ("C-s" . swiper-isearch)
-  ;;        )
-  )
-
-(use-package counsel
-  :ensure t
-  :pin melpa
-  :bind (
-         ("C-x C-f" . counsel-find-file)
-         ("M-x" . counsel-M-x)
-         ("M-y" . counsel-yank-pop)
-         ("C-c b" . counsel-descbinds)
-         ;; ディレクトリも再起的に検索するには、C-uを最初に打つ
-         ("C-c g" . counsel-ag)
-         :map counsel-find-file-map
-         ("C-l" . counsel-up-directory)
-         )
   )
 
 
