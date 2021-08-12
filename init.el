@@ -817,7 +817,9 @@
          ("M-y" . counsel-yank-pop)
          ("C-c b" . counsel-descbinds)
          ;; ディレクトリも再起的に検索するには、C-uを最初に打つ
-         ("C-c g" . counsel-ag)
+         ;; the_silver_searcherかripgrepをOSにインストールしておく
+         ;; ("C-c g" . counsel-ag)
+         ("C-c g" . counsel-rg)
          :map counsel-find-file-map
          ("C-l" . counsel-up-directory)
          )
@@ -828,9 +830,12 @@
 (use-package swiper
   :ensure t
   :pin melpa
-  ;; :bind (
-  ;;        ("C-s" . swiper-isearch)
-  ;;        )
+  :bind (
+         ;; ("C-s" . swiper-isearch)
+         ("C-s" . swiper)
+         ;; ("M-s M-s". swiper-all-thing-at-point)
+         ("M-s M-s". swiper-thing-at-point)
+         )
   )
 
 
@@ -860,8 +865,23 @@
   (when (setq enable-recursive-minibuffers t)
     (minibuffer-depth-indicate-mode 1))
 
+  ;; Swiperでmigemo
+  (defun my:ivy-migemo-re-builder (str)
+    "Own function for my:ivy-migemo."
+    (let* ((sep " \\|\\^\\|\\.\\|\\*")
+           (splitted (--map (s-join "" it)
+                            (--partition-by (s-matches-p " \\|\\^\\|\\.\\|\\*" it)
+                                            (s-split "" str t)))))
+      (s-join "" (--map (cond ((s-equals? it " ") ".*?")
+                              ((s-matches? sep it) it)
+                              (t (migemo-get-pattern it)))
+                        splitted))))
+  (setq ivy-re-builders-alist '((t . ivy--regex-plus)
+                                (swiper . my:ivy-migemo-re-builder)))
+
   (ivy-mode 1)
   )
+
 
 (use-package ivy-hydra
   :ensure t
