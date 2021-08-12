@@ -15,6 +15,7 @@ image-dired/
 phpactor/
 auto-save-list/
 .cache
+transient/
 
 # Data files
 ac-comphist.dat
