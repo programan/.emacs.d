@@ -35,10 +35,10 @@
     ;; use-packageのインストール
     (package-install 'use-package))
 
-  (custom-set-variables '(use-package-enable-imenu-support t))
+  (setq use-package-enable-imenu-support t)
   ;; (setq use-package-always-ensure t)
   ;; M-x use-package-report
-  (defvar use-package-compute-statistics t))
+  (setq use-package-compute-statistics t))
 
 (eval-when-compile
   (require 'use-package))
@@ -200,7 +200,7 @@
      ()))
   "*Face used by hl-line.")
 
-(defvar hl-line-face 'hlline-face)
+(setq hl-line-face 'hlline-face)
 ;; (setq hl-line-face 'underline) ; 下線
 (global-hl-line-mode)
 
@@ -280,8 +280,8 @@
   (interactive)
   (setq-local eww-disable-colorize nil)
   (eww-reload))
-(setq eww-search-prefix "http://www.google.co.jp/search?q=")
-
+;; (setq eww-search-prefix "http://www.google.co.jp/search?q=")
+(setq eww-search-prefix "https://www.google.com/search?&gws_rd=cr&complete=0&pws=0&tbs=li:1&q=")
 
 ;; ショートカットキー設定
 ;; M-g で指定行へ移動
@@ -320,7 +320,7 @@
 ;; gitとかcvsとかの便利機能をemacsで使わないならオフ
 ;; ちなみにgitはmagitというlispがある。でもWindowsでは動かないかも
 ;; (remove-hook 'find-file-hooks 'vc-find-file-hook)
-(eval-after-load "vc" '(remove-hook 'find-file-hook 'vc-find-file-hook))
+(eval-after-load "vc" '(remove-hook 'find-file-hooks 'vc-find-file-hook))
 
 
 ;; warn when opening files bigger than 200MB
@@ -351,9 +351,9 @@
   :ensure t
   ;; :disabled t
   :config
-  ;; interval 10days
+  ;; interval 1000days
   (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-interval 10)
+  (setq auto-package-update-interval 1000)
   (setq auto-package-update-prompt-before-update t)
   (auto-package-update-maybe)
 
@@ -634,7 +634,7 @@
     "Search TKK." (list 430675 2721866130))
 
   :bind(
-        ("C-M-t" . google-translate-enja-or-jaen))
+        ("C-M-g t" . google-translate-enja-or-jaen))
   )
 
 
@@ -808,6 +808,95 @@
   )
 
 
+(use-package counsel
+  :ensure t
+  :pin melpa
+  :bind (
+         ("C-x C-f" . counsel-find-file)
+         ("M-x" . counsel-M-x)
+         ("M-y" . counsel-yank-pop)
+         ("C-c b" . counsel-descbinds)
+         ;; ディレクトリも再起的に検索するには、C-uを最初に打つ
+         ;; the_silver_searcherかripgrepをOSにインストールしておく
+         ;; ("C-c g" . counsel-ag)
+         ("C-c g" . counsel-rg)
+         :map counsel-find-file-map
+         ("C-l" . counsel-up-directory)
+         )
+  :config
+  (counsel-mode 1)
+  )
+
+(use-package swiper
+  :ensure t
+  :pin melpa
+  :bind (
+         ;; ("C-s" . swiper-isearch)
+         ("C-s" . swiper)
+         ;; ("M-s M-s". swiper-all-thing-at-point)
+         ("M-s M-s". swiper-thing-at-point)
+         )
+  )
+
+
+(use-package ivy
+  :ensure t
+  :pin melpa
+  :custom
+  ;; ファイルリスト先頭または後尾で上下移動するとそれぞれ先頭後尾に移動する
+  (ivy-wrap t)
+  ;; プロンプトの表示が長い時に折り返す（選択候補も折り返される）
+  (ivy-truncate-lines nil)
+  ;; ivy-switch-buffer のリストに recent files と bookmark を含める
+  (ivy-use-virtual-buffers t)
+  ;; ivy-switch-buffer のリストにパスも含めて表示(同名ファイルで別ディレクトリも分けて表示)
+  (ivy-virtual-abbreviate 'full)
+  ;; ミニバッファのサイズ
+  (ivy-height 20)
+  (ivy-count-format "(%d/%d) ")
+
+  :bind (
+         ("C-;" . ivy-switch-buffer)
+         :map ivy-minibuffer-map
+         ("<escape>" . minibuffer-keyboard-quit)
+         )
+  :config
+  ;; ミニバッファでコマンド発行を認める
+  (when (setq enable-recursive-minibuffers t)
+    (minibuffer-depth-indicate-mode 1))
+
+  ;; Swiperでmigemo
+  (defun my:ivy-migemo-re-builder (str)
+    "Own function for my:ivy-migemo."
+    (let* ((sep " \\|\\^\\|\\.\\|\\*")
+           (splitted (--map (s-join "" it)
+                            (--partition-by (s-matches-p " \\|\\^\\|\\.\\|\\*" it)
+                                            (s-split "" str t)))))
+      (s-join "" (--map (cond ((s-equals? it " ") ".*?")
+                              ((s-matches? sep it) it)
+                              (t (migemo-get-pattern it)))
+                        splitted))))
+  (setq ivy-re-builders-alist '((t . ivy--regex-plus)
+                                (swiper . my:ivy-migemo-re-builder)))
+
+  (ivy-mode 1)
+  )
+
+
+(use-package ivy-hydra
+  :ensure t
+  :pin melpa
+  :custom
+  ;; M-o を ivy-hydra-read-action に割り当てる．
+  (ivy-read-action-function #'ivy-hydra-read-action)
+  )
+
+
+(use-package all-the-icons-ivy
+  :ensure t
+  :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
+  )
+
 (use-package projectile
   :ensure t
   :diminish projectile-mode
@@ -816,9 +905,6 @@
                 ("s-p" . projectile-command-map)
                 ("C-c p" . projectile-command-map)
                 )
-
-  :custom
-  (projectile-completion-system 'helm)
 
   ;; :config
   ;; (projectile-mode +1)
@@ -846,113 +932,11 @@
   ;; (projectile-rails-zeus-command "bin/zeus")
   )
 
-(use-package helm
-  :ensure t
-  :defer t
-  :diminish helm-mode
 
-  :bind (
-  ;; ファイル関係(履歴やバッファなどのファイルリスト)
-  ("C-;" . helm-for-files)
-  ;; ctagsによる関数ジャンプ
-  ;; ("M-." . helm-etags-select)
-  ;; 過去にコピーした履歴から選んで貼り付け
-  ("M-y" . helm-show-kill-ring)
-  ;; バッファ内の関数を絞り込む
-  ("C-c i" . helm-imenu)
-
-  ("M-x" . helm-M-x)
-  ("C-x C-f" . helm-find-files)
-
-  :map helm-find-files-map
-  ("C-h" . delete-backward-char)
-  ("TAB" . helm-execute-persistent-action)
-  )
-
-  :custom
-  ;; (helm-M-x-fuzzy-match t)
-  (helm-idle-delay             0.3)
-  (helm-input-idle-delay       0.3)
-  (helm-candidate-number-limit 200)
-
-  ;; locateを使わないようにする
-  (helm-for-files-preferred-list
-   '(helm-source-buffers-list
-     helm-source-recentf
-     helm-source-bookmarks
-     helm-source-file-cache
-     helm-source-files-in-current-dir
-     ;; helm-source-locate
-     ))
-
-  :config
-  (helm-mode 1))
-
-
-(use-package helm-descbinds
-  :ensure t
-  :defer t
-  :bind(
-        ("C-c b" . helm-descbinds))
-  :config
-  (helm-descbinds-mode))
-
-(use-package helm-migemo
-  :ensure t
-  :defer t
-  :config
-  (helm-migemo-mode 1))
-
-(use-package helm-ag
- :ensure t
- :defer t
- :bind (
-        ;; ディレクトリも再起的に検索するには、C-uを最初に打つ
-        ("C-c g" . helm-do-ag)))
-
-(use-package helm-swoop
-  :ensure t
-  :defer t
-  :bind (
-         ("M-i" . helm-swoop)
-         ("M-I" . helm-swoop-back-to-last-point)
-         ("C-c M-i" . helm-multi-swoop)
-         ("C-x M-i" . helm-multi-swoop-all)
-
-         :map isearch-mode-map
-         ("M-i" . helm-swoop-from-isearch)
-         :map helm-swoop-map
-         ("M-i" . helm-multi-swoop-all-from-helm-swoop)
-         ("M-m" . helm-multi-swoop-current-mode-from-helm-swoop)
-         ("C-r" . helm-previous-line)
-         ("C-s" . helm-next-line)
-         :map helm-multi-swoop-map
-         ("C-r" . helm-previous-line)
-         ("C-s" . helm-next-line)
-         )
-
-  :custom
-  (helm-multi-swoop-edit-save t)
-  (helm-swoop-move-to-line-cycle t)
-  ;; If you prefer fuzzy matching
-  ;; (helm-swoop-use-fuzzy-match t)
-  )
-
-
-(use-package helm-projectile
-  :after projectile
-  :ensure t
-  :bind (
-         ("C-c s p" . helm-projectile-switch-project))
-  :config
-  (helm-projectile-on)
-  )
-
-(use-package helm-icons
-  ;; :after treemacs
+(use-package counsel-projectile
   :ensure t
   :config
-  (helm-icons-enable)
+  (counsel-projectile-mode)
   )
 
 
@@ -1241,36 +1225,6 @@
          )
   )
 
-(use-package dumb-jump
-  :ensure t
-  :defer t
-  :hook (
-         (xref-backend-functions . dumb-jump-xref-activate)
-  ;;        (prog-mode . dumb-jump-mode)
-  ;;        (php-mode . dumb-jump-mode)
-         )
-
-  :custom
-  (dumb-jump-selector 'helm)
-  (dumb-jump-use-visible-window nil)
-
-  (dumb-jump-default-project "")
-  (dumb-jump-force-searcher 'ag)
-
-  ;; :config
-  ;;;; C-M-g jump
-  ;;;; C-M-p back
-  ;;;; C-M-q
-  ;; (dumb-jump-mode)
-
-  ;; :bind
-  ;; (define-key global-map [(super .)] 'dumb-jump-go)
-  ;; (define-key global-map [(super shift .)] 'dumb-jump-back)
-  ;; (define-key global-map (kbd "S-.") 'dumb-jump-go)
-  ;; (define-key global-map (kbd "S-,") 'dumb-jump-back)
-  ;; (global-set-key (kbd "S-.") 'dumb-jump-go)
-  ;; (global-set-key (kbd "S-,") 'dumb-jump-back)
-  )
 
 ;; Language Server Protocolクライアント
 ;; the_silver_searcherかripgrepもOSに入れておく
@@ -1285,11 +1239,13 @@
   ;; -> errorは表示されるけどインストールは完了しているかも
   :ensure t
   ;; GNU版を指定しないとproject.elが入り、emacsのbuilt-inのprojectとバッティングしてしまう
-  :pin gnu
+  ;; :pin gnu
   ;; :pin melpa
   ;; :hook (
   ;;        (ruby-mode . eglot-ensure)
   ;;        )
+  :custom
+  (eglot-connect-timeout 30)
   )
 
 
@@ -1360,6 +1316,7 @@
 
 (use-package ruby-block
   ;; :ensure t
+  :load-path "~/.emacs.d/site-lisp/"
   :after (ruby-mode)
   :diminish ruby-block-mode
   :hook
@@ -1475,8 +1432,6 @@
   )
 
 
-
-
 (use-package yaml-mode
   :ensure t
   :defer t
@@ -1493,7 +1448,12 @@
          ("\\.mdwn\\'" . gfm-mode)
          ("\\.markdown\\'" . gfm-mode)
          )
-
+  ;; デフォルトでtabは見出しの折り畳みのトグルq
+  ;; (bind-keys :map markdown-mode-map
+  ;;            ("<Tab>" . markdown-cycle)
+  ;;            ("<S-tab>" . markdown-shifttab)
+  ;;            ("C-M-n" . outline-next-visible-heading)
+  ;;            ("C-M-p" . outline-previous-visible-heading))
   :config
   (setq
    markdown-command "marked"
@@ -1689,6 +1649,31 @@ hljs.initHighlightingOnLoad();
          )
   )
 
+
+(use-package typescript-mode
+  :ensure t
+  :mode (
+         ("\\.ts\\'" . typescript-mode)
+         )
+  )
+
+(use-package python-mode
+  :ensure t
+  :mode (
+         ("\\.py\\'" . python-mode)
+         )
+  :custom
+  (python-indent 4)
+  (tab-width 4)
+  (indent-tabs-mode nil)
+
+  :hook (
+         (python-mode . electric-pair-mode)
+         ;; (python-mode . flymake-python-pyflakes-load)
+         )
+  )
+
+
 ;; JavaScriptの関数定義ジャンプ
 (use-package xref-js2
   :ensure t
@@ -1708,8 +1693,30 @@ hljs.initHighlightingOnLoad();
   :hook(
         ;; npm i -g typescript-language-server; npm i -g typescript
         (js2-mode . lsp)
+        (typescript-mode . lsp)
+        ;; npm i -g lsp-pyright
+        (python-mode . lsp)
         )
+  :custom
+  (lsp-auto-configure t)
+  (lsp-enable-completion-at-point t)
+  (lsp-enable-xref t)
+  (lsp-diagnostics-provider :flycheck)
+  ;; (lsp-eldoc-enable-hover t)
+  ;; (lsp-eldoc-render-all nil)
+
+  (lsp-headerline-breadcrumb-enable t)
+  (lsp-headerline-breadcrumb-segments '(project file symbols))
+
   :commands (lsp lsp-deferred)
+  :config
+  ;; watch 対象から外すリスト
+  (dolist (dir '(
+                 "[/\\\\]\\.venv$"
+                 "[/\\\\]\\.mypy_cache$"
+                 "[/\\\\]__pycache__$"
+                 ))
+    (push dir lsp-file-watch-ignored))
   )
 
 (use-package lsp-ui
@@ -1717,11 +1724,174 @@ hljs.initHighlightingOnLoad();
   :commands lsp-ui-mode
   )
 
-(use-package helm-lsp
+;; MS製のlanguage server
+;; npm i -g lsp-pyright
+(use-package lsp-pyright
   :ensure t
-  :commands helm-lsp-workspace-symbol
+  :after python-mode
+  :init
+  (defun lsp-pyright/python-mode-hook
+    ()
+    (require 'lsp-pyright)
+    (when (fboundp 'flycheck-mode)
+      ;; LSPで構文チェック
+      ;; python3.5から導入されたmypyをオフ
+      (setq flycheck-disabled-checkers '(python-mypy))
+      ;; flake8を使う
+      ;; (custom-set-variables
+      ;;  '(flycheck-python-flake8-executable "python3")
+      ;;  '(flycheck-python-pycompile-executable "python3")
+      ;;  '(flycheck-python-pylint-executable "python3"))
+      ;; (defvaralias 'flycheck-python-flake8-executable 'python-shell-interpreter)
+      ;; (setq flycheck-python-flake8-executable "flake8")
+      )
+    )
+
+  :hook (
+         (python-mode . lsp-pyright/python-mode-hook)
+         )
   )
 
+
+;; .venvに入れたライブラリを含めた補完
+;; pip install virtualenvwrapper
+(use-package virtualenvwrapper
+  :ensure t
+  )
+
+(use-package auto-virtualenvwrapper
+  :ensure t
+  :hook (
+         ;; 自動で.venvのライブラリを使用
+         (python-mode . auto-virtualenvwrapper-activate)
+         )
+  )
+
+
+(use-package org
+  :mode (
+         ("\\.org$" . org-mode)
+         )
+  :bind (
+         ("C-c c" . org-capture)
+         ("C-c l" . org-store-link)
+         ("C-c a" . org-agenda)
+         ("C-c b" . org-iswitchb)
+         )
+  :custom
+  ;; org-modeのタスク状態の遷移
+  (org-todo-keywords '((sequence "TODO" "SOMEDAY" "WAITING" "|" "DONE" "CANCELED")))
+  ;; タスク状態をDONEにした場合に時刻を挿入
+  (org-log-done 'time)
+  ;; メモファイルの場所
+  (org-directory "~/Org")
+  (org-default-notes-file "notes.org")
+  ;; TODOリストで、子リストをDONEにしないと親をDONEにできない
+  (org-enforce-todo-dependencies t)
+  (org-agenda-files '("~/Org/gtd.org"
+                      ;; "~/Org/project.org"
+                      ))
+  ;; Org-captureのテンプレートの設定
+  ;; TODOはC-c C-dで締切入力、C-c C-sで作業予定日入力
+  (org-capture-templates
+   '(("t" "Todo" entry (file+headline "~/Org/gtd.org" "INBOX")
+      "* TODO %?\n %i\n %a")
+     ("n" "Note" entry (file+headline "~/Org/notes.org" "Notes")
+      "* %U %?\n%i\n %a")
+     ))
+
+  ;; 長い文章を折り返す
+  ;; (org-startup-truncated nil)
+
+  ;; 勝手に入力される \hypersetup{} は使わない(usepackage の順序依存に配慮)
+  (org-latex-with-hyperref nil)
+
+  (org-latex-pdf-process
+   '("platex -shell-escape %f"
+     "platex -shell-escape %f"
+     "pbibtex %b"
+     "platex -shell-escape %f"
+     "platex -shell-escape %f"
+     "dvipdfmx %b.dvi"))
+
+  (org-latex-title-command "\\maketitle")
+  (org-latex-toc-command
+   "\\tableofcontents\n")
+  (org-latex-text-markup-alist '((bold . "\\textbf{%s}")
+                                 (code . verb)
+                                 (italic . "\\it{%s}")
+                                 (strike-through . "\\sout{%s}")
+                                 (underline . "\\uline{%s}")
+                                 (verbatim . protectedtexttt)))
+
+  (org-export-latex-listings t)
+  (org-latex-listings 'minted)
+  (org-latex-minted-options
+   '(("frame" "lines")
+     ("framesep=2mm")
+     ("linenos=true")
+     ("baselinestretch=1.2")
+     ("fontsize=\\footnotesize")
+     ("breaklines")
+     ))
+
+  :config
+  ;; captureで書いたメモを見る設定
+  (defun show-org-buffer (file)
+    "Show an org-file FILE on the current buffer."
+    (interactive)
+    (if (get-buffer file)
+        (let ((buffer (get-buffer file)))
+          (switch-to-buffer buffer)
+          (message "%s" file))
+      (find-file (concat "~/Org/" file))))
+  (global-set-key (kbd "C-M-^") '(lambda () (interactive)
+                                   (show-org-buffer "notes.org")))
+
+  (add-to-list 'org-latex-packages-alist "\\hypersetup{setpagesize=false}" t)
+  (add-to-list 'org-latex-packages-alist "\\hypersetup{colorlinks=true}" t)
+  (add-to-list 'org-latex-packages-alist "\\hypersetup{linkcolor=blue}" t)
+
+  (require 'ox-latex)
+  ;; インデントすると *.tex にそのまま入ってしまう
+  (with-eval-after-load 'ox-latex
+    (add-to-list 'org-latex-classes
+                 '("myjsarticle"
+                   "\\documentclass[uplatex,dvipdfmx,12pt]{jsarticle}
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsfonts}
+\\usepackage{amsmath}
+% \\usepackage{newtxtext,newtxmath}
+\\usepackage[normalem]{ulem}
+\\usepackage{textcomp}
+\\usepackage{minted}
+\\usemintedstyle{emacs}
+\\usepackage[dvipdfmx]{graphicx}
+\\usepackage[dvipdfmx]{color}
+\\usepackage{booktabs}
+\\usepackage{longtable}
+\\usepackage{wrapfig}
+\\usepackage[dvipdfmx]{hyperref}
+\\usepackage{pxjahyper}
+% \\hypersetup{pdfencoding=auto}"
+  ("\\section{%s}" . "\\section*{%s}")
+  ("\\subsection{%s}" . "\\subsection*{%s}")
+  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+
+
+  ;; org-modeでMarkdownのexportを有効にする
+  (require 'ox-md nil t)
+  )
+
+(use-package org-bullets
+  :ensure t
+  :hook (
+         (org-mode . org-bullets-mode)
+         )
+  )
 
 (use-package geben
   ;; :pin melpa
@@ -1745,6 +1915,7 @@ hljs.initHighlightingOnLoad();
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(5 ((shift) . 1)))
  '(package-selected-packages '(geben use-package))
+ '(python-indent-offset 4 nil nil "Customized with use-package python-mode")
  '(scroll-step 1)
  '(tron-legacy-theme-dark-fg-bright-comments t)
  '(uniquify-buffer-name-style 'post-forward-angle-brackets nil (uniquify))
