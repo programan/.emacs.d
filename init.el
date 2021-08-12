@@ -651,6 +651,10 @@
   :ensure t
   )
 
+(use-package rg
+  :ensure t
+  )
+
 (use-package bash-completion
   :ensure t
   :init
