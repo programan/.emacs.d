@@ -552,11 +552,12 @@
   ;;themeで設定された色を少し変える
   ;; 行番号エリアの色
   (set-face-attribute 'line-number nil
-                      :foreground "ivory4"
-                      :background "gray3")
-  
+                      :foreground "snow4"
+                      :background "gray5")
+
   (set-face-attribute 'line-number-current-line nil
-                      :foreground "turquoise3")
+                      :foreground "turquoise2"
+                      :background "black")
 
   ;; モードラインの色
   (set-face-foreground 'mode-line "DeepSkyBlue")
