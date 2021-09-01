@@ -83,4 +83,13 @@
   (load-library "migemo")
   (migemo-init))
 
+
+;; Windowsの場合はtrampでplinkコマンドを使用する
+;; Puttyをインストールしてplinkにパスを通しておく
+;; NG C-x C-f /ssh:username@hostname#port:/path/to/file
+;; OK C-x C-f /plink:username@hostname#port:/path/to/file
+;; OK C-x C-f /plink:username@hostname#port|sudo:hostname:/path/to/file
+;; pageantで保存してあるセッション名を使う場合は、C-x C-f /plinkx:
+(setq-default tramp-default-method "plink")
+
 ;;; init-windows.el ends here
