@@ -1243,6 +1243,7 @@
   ;; package-list-packagesでインストールしないと失敗する
   ;; -> errorは表示されるけどインストールは完了しているかも
   :ensure t
+  :disabled t
   ;; GNU版を指定しないとproject.elが入り、emacsのbuilt-inのprojectとバッティングしてしまう
   ;; :pin gnu
   ;; :pin melpa
@@ -1345,53 +1346,6 @@
   (inf-ruby-eval-binding "Pry.toplevel_binding")
   )
 
-(use-package robe
-  :ensure t
-  :disabled t
-  :diminish robe-mode
-  :hook (
-         (ruby-mode . robe-mode)
-         )
-  :config
-  ;; rvmを利用してrubyのバージョンを管理している場合はこの設定で.rvmrcなどで選択されているrubyを使う
-  ;; (defadvice inf-ruby-console-auto (before activate-rvm-for-robe activate)
-  ;;   (rvm-activate-corresponding-ruby))
-  (advice-add 'inf-ruby-console-auto :before #'rvm-activate-corresponding-ruby)
-
-  ;; companyでrobeの補完を表示
-  (eval-after-load 'company
-    '(push 'company-robe company-backends))
-  )
-
-(use-package ac-php
-  ;; php-cliとcscopeが必要
-  ;; Windowsならcscopeはscoopとかchocolateyとかで入れる
-  ;; プロジェクトルートに.ac-php-conf.jsonファイルを作る
-  ;; プロジェクトのソースコードを開き M-x ac-php-remake-tags-all
-  ;; ~/.ac-php内にtagファイルが生成される
-  ;; Windowsの場合は環境変数HOMEに%USERPROFILE%を設定する
-  :ensure t
-  ;; :pin melpa-stable
-  :init
-  (setq ac-php-auto-update-intval 180)
-  ;; :hook (
-  ;;        ;; (php-mode . ac-php-remake-tags)
-  ;;        ;; (projectile-idle-timer . ac-php-remake-tags)
-  ;;        ;; (after-save . ac-php-remake-tags)
-  ;;        )
-  :config
-  (defun remake-ac-php-tags ()
-    "Remake php tags from current buffer"
-    (when (eq major-mode 'php-mode)
-      (ac-php-remake-tags))
-    )
-  (add-hook 'after-save-hook #'remake-ac-php-tags)
-  )
-
-(use-package company-php
-  :ensure t
-  :after (company))
-
 
 (use-package php-mode
   :ensure t
@@ -1408,32 +1362,14 @@
   (php-search-documentation-browser-function 'eww-browse-url)
   (php-style-delete-trailing-whitespace 1)
   :bind (
-         :map php-mode-map
-              ("M-." . ac-php-find-symbol-at-point)
-              ("M-," . ac-php-location-stack-back)
-              )
+         )
   :hook (
          (php-mode . electric-pair-mode)
          ;; M-fなどの単語単位の移動をキャメルケース単位にする
          (php-mode . subword-mode)
          ;; (php-mode . my-php-flycheck-setup)
-
-         ((php-mode . (lambda ()
-                        (ac-php-core-eldoc-setup) ;; enable eldoc
-                        (set (make-local-variable 'company-backends)
-                             '(;; list of backends
-                               (company-ac-php-backend
-                                company-dabbrev-code
-                                company-capf company-files
-                                )))))
-          ))
+         )
   :config
-  ;; (defun my-php-flycheck-setup ()
-  ;;   "My PHP-mode hook."
-  ;;   (require 'flycheck-phpstan)
-  ;;   (flycheck-mode t)
-  ;;   (flycheck-select-checker 'phpstan)
-  ;;   )
   )
 
 
@@ -1701,6 +1637,16 @@ hljs.initHighlightingOnLoad();
         (typescript-mode . lsp)
         ;; npm i -g lsp-pyright
         (python-mode . lsp)
+        ;; composer global require jetbrains/phpstorm-stubs:dev-master
+        ;; composer global require felixfbecker/language-server
+        ;; または各プロジェクト毎にcomposer.jsonを用意してcomposer install
+        ;; npmで提供されているlsp npm i -g intelephense
+        ;; intelephenseの方が安定している感じ
+        (php-mode . lsp)
+        ;; npm i -g bash-language-server
+        (sh-mode . lsp)
+        ;; gem install solargraph
+        (ruby-mode . lsp)
         )
   :custom
   (lsp-auto-configure t)
