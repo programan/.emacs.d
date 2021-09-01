@@ -16,6 +16,7 @@ phpactor/
 auto-save-list/
 .cache
 transient/
+lsp-cache/
 
 # Data files
 ac-comphist.dat
