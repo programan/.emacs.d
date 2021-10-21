@@ -1513,28 +1513,37 @@ hljs.initHighlightingOnLoad();
          )
   :custom
   ;; web-modeの設定
+  (web-mode-attr-indent-offset nil)
   (web-mode-markup-indent-offset 4) ;; html indent
   (web-mode-css-indent-offset 4)    ;; css indent
   (web-mode-code-indent-offset 4)   ;; script indent(js,php,etc..)
   (web-mode-comment-style 2)
+  (web-mode-enable-current-element-highlight t)
+  (indent-tabs-mode nil)
+
+  ;; タグを自動で閉じる
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-auto-closing t)
+
   :bind (
          :map web-mode-map
               ("C-;" . nil)
               ("C-c C-;" . web-mode-comment-or-uncomment)
               )
-  :config
-  (defun my-web-mode-hook ()
-    "Hooks for Web mode."
-    ;; 変更日時の自動修正
-    (setq time-stamp-line-limit -200)
-    (if (not (memq 'time-stamp write-file-hooks))
-	(setq write-file-hooks
-	      (cons 'time-stamp write-file-hooks)))
-    (setq time-stamp-format " %3a %3b %02d %02H:%02M:%02S %:y %Z")
-    (setq time-stamp-start "Last modified:")
-    (setq time-stamp-end "$")
-    )
-  (add-hook 'web-mode-hook  'my-web-mode-hook))
+  ;; :config
+  ;; (defun my-web-mode-hook ()
+  ;;   "Hooks for Web mode."
+  ;;   ;; 変更日時の自動修正
+  ;;   (setq time-stamp-line-limit -200)
+  ;;   (if (not (memq 'time-stamp write-file-hooks))
+  ;;   (setq write-file-hooks
+  ;;         (cons 'time-stamp write-file-hooks)))
+  ;;   (setq time-stamp-format " %3a %3b %02d %02H:%02M:%02S %:y %Z")
+  ;;   (setq time-stamp-start "Last modified:")
+  ;;   (setq time-stamp-end "$")
+  ;;   )
+  ;; (add-hook 'web-mode-hook  'my-web-mode-hook)
+  )
 
 
 (use-package linum
@@ -1557,7 +1566,7 @@ hljs.initHighlightingOnLoad();
   :defer t
   :mode (
          ("\\.js\\'" . js2-mode)
-         ("\\.jsx\\'" . js2-jsx-mode)
+         ;; ("\\.jsx\\'" . js2-jsx-mode)
          )
   :hook (
          (js2-mode . electric-pair-mode)
@@ -1582,6 +1591,28 @@ hljs.initHighlightingOnLoad();
               (lambda (c) (eq c ?#)))
   )
 
+(use-package rjsx-mode
+  :ensure t
+  :mode (
+         ("\\.jsx\\'" . rjsx-mode)
+         ("components\\/.*\\.js\\'" . rjsx-mode)
+         )
+  :hook (
+         (rjsx-mode . electric-pair-mode)
+         )
+  :bind (
+         :map rjsx-mode-map
+              ("M-." . nil)
+              ("M-," . nil)
+              )
+  :custom
+  ;; 関数の引数が複数個ある場合に、改行したら前の引数の位置にインデントを揃える
+  (js-indent-align-list-continuation t)
+  ;; (js-indent-align-list-continuation nil)
+  (js2r-prefered-quote-type 2)
+  )
+
+
 ;; nodeのnpmでjsonlintをグローバルにインストールしておく
 (use-package json-mode
   :ensure t
@@ -1595,6 +1626,11 @@ hljs.initHighlightingOnLoad();
   :ensure t
   :mode (
          ("\\.ts\\'" . typescript-mode)
+         )
+  :hook (
+         (typescript-mode . (lambda ()
+                              (interactive)
+                              (mmm-mode)))
          )
   )
 
@@ -1612,6 +1648,42 @@ hljs.initHighlightingOnLoad();
          (python-mode . electric-pair-mode)
          ;; (python-mode . flymake-python-pyflakes-load)
          )
+  )
+
+
+(use-package mmm-mode
+  :ensure t
+  :commands mmm-mode
+  :mode (
+         ("\\.ts\\'" . typescript-mode)
+         ("\\.tsx\\'" . typescript-mode)
+         )
+
+  :custom
+  (mmm-global-mode t)
+  (mmm-submode-decoration-level 0)
+
+  :config
+  (mmm-add-classes
+   '((mmm-jsx-mode
+      :submode web-mode
+      :face mmm-code-submode-face
+      :front "\\(return\s\\|n\s\\|(\n\s*\\)<"
+      :front-offset -1
+      :back ">\n?\s*)\n}\n"
+      :back-offset 1
+      )))
+  (mmm-add-mode-ext-class 'typescript-mode nil 'mmm-jsx-mode)
+
+  (defun mmm-reapply ()
+    (mmm-mode)
+    (mmm-mode))
+
+  (add-hook 'after-save-hook
+            (lambda ()
+              (when (string-match-p "\\.tsx?" buffer-file-name)
+                (mmm-reapply)
+                )))
   )
 
 
