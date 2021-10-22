@@ -1839,7 +1839,7 @@ hljs.initHighlightingOnLoad();
 
   (org-latex-title-command "\\maketitle")
   (org-latex-toc-command
-   "\\tableofcontents\n")
+   "\\tableofcontents \\clearpage")
   (org-latex-text-markup-alist '((bold . "\\textbf{%s}")
                                  (code . verb)
                                  (italic . "\\it{%s}")
