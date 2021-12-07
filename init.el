@@ -1707,7 +1707,7 @@ hljs.initHighlightingOnLoad();
         ;; npm i -g typescript-language-server; npm i -g typescript
         (js2-mode . lsp)
         (typescript-mode . lsp)
-        ;; npm i -g lsp-pyright
+        ;; npm i -g pyright
         (python-mode . lsp)
         ;; composer global require jetbrains/phpstorm-stubs:dev-master
         ;; composer global require felixfbecker/language-server
@@ -1748,7 +1748,7 @@ hljs.initHighlightingOnLoad();
   )
 
 ;; MS製のlanguage server
-;; npm i -g lsp-pyright
+;; npm i -g pyright
 (use-package lsp-pyright
   :ensure t
   :after python-mode
