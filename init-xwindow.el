@@ -29,7 +29,7 @@
 (setq pc-select-selection-keys-only t)
 
 ;; フォントの指定
-(add-to-list 'default-frame-alist '(font . "HackGenNerd-11"))
+(add-to-list 'default-frame-alist '(font . "HackGenNerd-13"))
 
 (use-package exec-path-from-shell
   :ensure t
