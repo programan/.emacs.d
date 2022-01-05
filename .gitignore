@@ -35,3 +35,5 @@ bookmarks
 
 .lsp-session*
 .lsp-eslint-choices
+
+smex-items

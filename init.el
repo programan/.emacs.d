@@ -902,6 +902,14 @@
   :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
   )
 
+
+(use-package smex
+  :ensure t
+  :custom
+  (smex-history-length 30)
+  (smex-completion-method 'ivy)
+  )
+
 (use-package projectile
   :ensure t
   :diminish projectile-mode
@@ -1796,10 +1804,10 @@ hljs.initHighlightingOnLoad();
          ("\\.org$" . org-mode)
          )
   :bind (
-         ("C-c c" . org-capture)
-         ("C-c l" . org-store-link)
-         ("C-c a" . org-agenda)
-         ("C-c b" . org-iswitchb)
+         ("C-c cc" . org-capture)
+         ("C-c cl" . org-store-link)
+         ("C-c ca" . org-agenda)
+         ("C-c cb" . org-iswitchb)
          )
   :custom
   ;; org-modeのタスク状態の遷移
