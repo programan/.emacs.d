@@ -1510,6 +1510,7 @@ hljs.initHighlightingOnLoad();
          ("\\.xhtml\\'" . web-mode)
          ("\\.shtml\\'" . web-mode)
          ("\\.tpl\\'" . web-mode)
+         ("\\.tmpl\\'" . web-mode)
          ("\\.ctp\\'" . web-mode)
          ("\\.ejs\\'" . web-mode)
          ("\\.[agj]sp\\'" . web-mode)
