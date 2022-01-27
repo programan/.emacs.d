@@ -566,6 +566,15 @@
   )
 
 
+(use-package websocket
+  :ensure t)
+
+(use-package web-server
+  :ensure t)
+
+(use-package uuidgen
+  :ensure t)
+
 ;; 英語か日本語かは自動判定してくれる
 ;; region指定してC-M-tすると、そのregionの翻訳をしてくれる
 ;; region指定せずにC-M-tすると、現在位置のwordを翻訳してくれる
@@ -1464,6 +1473,14 @@ hljs.initHighlightingOnLoad();
 </script>
 "))
 
+(use-package markdown-preview-mode
+  :ensure t
+  :config
+  (setq markdown-preview-http-port 19000)
+  (setq markdown-preview-stylesheets (list "https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"))
+  ;; (setq markdown-preview-stylesheets (list "https://raw.githubusercontent.com/richleland/pygments-css/master/emacs.css"))
+  (setq markdown-preview-javascript (list "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
+  )
 
 (use-package markdown-toc
   :ensure t)
