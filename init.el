@@ -1406,26 +1406,32 @@
          ("\\.mdwn\\'" . gfm-mode)
          ("\\.markdown\\'" . gfm-mode)
          )
-  ;; デフォルトでtabは見出しの折り畳みのトグルq
+  ;; デフォルトでtabは見出しの折り畳みのトグル
   ;; (bind-keys :map markdown-mode-map
   ;;            ("<Tab>" . markdown-cycle)
   ;;            ("<S-tab>" . markdown-shifttab)
   ;;            ("C-M-n" . outline-next-visible-heading)
   ;;            ("C-M-p" . outline-previous-visible-heading))
+
+  :custom
+  ;; (markdown-enable-math t)
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-command "marked")
+  (markdown-xhtml-body-preamble "<div class=\"markdown-body\">")
+  (markdown-xhtml-body-epilogue "</div>")
+  (markdown-content-type "application/xhtml+xml")
+  ;; (markdown-content-type "application/html")
+  (markdown-css-paths '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
+                        "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css"))
+
   :config
   (setq
-   markdown-command "marked"
-   markdown-fontify-code-blocks-natively t
-   markdown-content-type "application/xhtml+xml"
-   ;; markdown-content-type "application/html"
-   markdown-css-paths '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css")
    markdown-xhtml-header-content "
 <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css'>
 <style>
-body {
+.markdown-body {
   box-sizing: border-box;
-  max-width: 768px;
+  max-width: 1024px;
   width: 100%;
   margin: 40px auto;
   padding: 0 10px;
@@ -1462,16 +1468,28 @@ hr {
   }
 }
 </style>
-<script src='http://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script>
+<script src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.classList.add('markdown-body');
-});
+hljs.highlightAll();
 </script>
 <script>
-hljs.initHighlightingOnLoad();
+MathJax = {
+  tex: {
+    inlineMath: [
+      ['$','$'],
+      ['\\(', '\\)']
+    ],
+    displayMath: [
+      ['$$', '$$'],
+      ['\\[', '\\]']
+    ],
+  }
+};
 </script>
-"))
+<script type='text/javascript' id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+"
+   ))
+
 
 (use-package markdown-preview-mode
   :ensure t
@@ -1479,7 +1497,8 @@ hljs.initHighlightingOnLoad();
   (setq markdown-preview-http-port 19000)
   (setq markdown-preview-stylesheets (list "https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"))
   ;; (setq markdown-preview-stylesheets (list "https://raw.githubusercontent.com/richleland/pygments-css/master/emacs.css"))
-  (setq markdown-preview-javascript (list "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"))
+  (setq markdown-preview-javascript (list "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
+  ;; (setq markdown-preview-javascript (list "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" "async"))
   )
 
 (use-package markdown-toc
