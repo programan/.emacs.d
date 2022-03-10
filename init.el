@@ -1417,6 +1417,7 @@
   ;; (markdown-enable-math t)
   (markdown-fontify-code-blocks-natively t)
   (markdown-command "marked")
+  (markdown-enable-math t)
   (markdown-xhtml-body-preamble "<div class=\"markdown-body\">")
   (markdown-xhtml-body-epilogue "</div>")
   (markdown-content-type "application/xhtml+xml")
@@ -1495,10 +1496,48 @@ MathJax = {
   :ensure t
   :config
   (setq markdown-preview-http-port 19000)
-  (setq markdown-preview-stylesheets (list "https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"))
+  (setq markdown-preview-stylesheets (list "https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
+                                           "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css"))
   ;; (setq markdown-preview-stylesheets (list "https://raw.githubusercontent.com/richleland/pygments-css/master/emacs.css"))
-  (setq markdown-preview-javascript (list "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"))
-  ;; (setq markdown-preview-javascript (list "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" "async"))
+  (setq markdown-preview-javascript (list "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"
+                                          "
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  hljs.highlightAll();
+});
+</script>
+"
+                                          "
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [
+      ['$','$'],
+      ['\(', '\)']
+    ],
+    displayMath: [
+      ['$$', '$$'],
+      ['\[', '\]']
+    ],
+  }
+};
+
+setInterval(() => {
+  document.querySelectorAll('pre code').forEach((block) => {
+    hljs.highlightBlock(block);
+  });
+
+  MathJax.typesetClear();
+  MathJax.startup.document.state(0);
+  MathJax.texReset();
+  MathJax.typeset();
+}, 2000);
+</script>
+"
+                                          "
+<script type='text/javascript' id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+"
+                                          ))
   )
 
 (use-package markdown-toc
