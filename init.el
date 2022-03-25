@@ -1447,6 +1447,16 @@ h2 {
 hr {
   page-break-before: always;
 }
+/*hrの直後にh1, h2があった場合は改行コードを付けない*/
+hr+h1 {
+  page-break-before: avoid;
+}
+hr+h2 {
+  page-break-before: avoid;
+}
+.markdown-body pre > code { white-space: pre-wrap; }
+.markdown-body table { display:table; break-inside: auto; word-break: break-word; }
+.markdown-body tr { break-inside: avoid; break-after: auto; }
 /*印刷時のスタイル*/
 @media print {
   @page {
@@ -1459,13 +1469,6 @@ hr {
   }
   h2 {
     padding-top: 10mm;
-  }
-  /*hrの直後にh1, h2があった場合は改行コードを付けない*/
-  hr+h1 {
-    page-break-before: auto;
-  }
-  hr+h2 {
-    page-break-before: auto;
   }
 }
 </style>
@@ -1598,7 +1601,7 @@ setInterval(() => {
   (plantuml-options "-charset UTF-8")
   ;; (plantuml-default-exec-mode 'executable)
   (plantuml-default-exec-mode 'jar)
-  (plantuml-output-type "png")
+  (plantuml-output-type "svg")
 
   :config
   (defun plantuml-preview-frame (prefix)
