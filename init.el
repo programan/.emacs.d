@@ -965,6 +965,8 @@
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode "UndoT"
+  :custom
+  (undo-tree-auto-save-history nil)
   :config
   (global-undo-tree-mode t))
 
