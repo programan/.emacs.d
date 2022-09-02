@@ -1480,15 +1480,19 @@ hljs.highlightAll();
 </script>
 <script>
 MathJax = {
+  chtml: {
+    matchFontHeight: false
+  },
   tex: {
     inlineMath: [
       ['$','$'],
-      ['\\(', '\\)']
+      // ['\\(', '\\)']
     ],
     displayMath: [
       ['$$', '$$'],
-      ['\\[', '\\]']
+      // ['\\[', '\\]']
     ],
+    processEscapes: true,      // use \$ to produce a literal dollar sign
   }
 };
 </script>
@@ -1518,11 +1522,11 @@ MathJax = {
   tex: {
     inlineMath: [
       ['$','$'],
-      ['\(', '\)']
+      // ['\(', '\)']
     ],
     displayMath: [
       ['$$', '$$'],
-      ['\[', '\]']
+      // ['\[', '\]']
     ],
   }
 };
