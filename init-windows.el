@@ -19,7 +19,7 @@
 ;; MS-Windows shell-mode
 (add-hook
  'shell-mode-hook
- '(lambda ()
+ #'(lambda ()
    (set-buffer-process-coding-system 'sjis 'sjis)))
 
 ;; Cygwin入ってる場合に設定しておくとfind grep使える
