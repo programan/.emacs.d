@@ -499,7 +499,7 @@
 
   (with-eval-after-load "org"
     (define-key org-mode-map (kbd "C-y")
-      '(lambda () (interactive)
+      #'(lambda () (interactive)
          (org-yank)
          (my:vhl-change-color))))
   )
@@ -1991,7 +1991,7 @@ setInterval(() => {
           (switch-to-buffer buffer)
           (message "%s" file))
       (find-file (concat "~/Org/" file))))
-  (global-set-key (kbd "C-M-^") '(lambda () (interactive)
+  (global-set-key (kbd "C-M-^") #'(lambda () (interactive)
                                    (show-org-buffer "notes.org")))
 
   (add-to-list 'org-latex-packages-alist "\\hypersetup{setpagesize=false}" t)
