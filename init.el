@@ -1584,38 +1584,6 @@ setInterval(() => {
               )
   )
 
-;; Need plantuml.jar and graphviz.
-(use-package plantuml-mode
-  :ensure t
-  :mode (
-         ("\\.pu\\'" . plantuml-mode)
-         ("\\.plantuml\\'" . plantuml-mode)
-         )
-  ;; :hook(
-  ;;       (plantuml-mode . (lambda ()
-  ;;                          (setq plantuml-executable-args
-  ;;                                (append plantuml-executable-args '("-charset" "UTF-8"))
-  ;;                                )
-  ;;                          )
-  ;;                      )
-  ;;       )
-
-  :custom
-  ;; (plantuml-executable-path "~/plantuml/plantuml")
-  (plantuml-jar-path "~/plantuml/plantuml.jar")
-  (plantuml-java-options "")
-  (plantuml-options "-charset UTF-8")
-  ;; (plantuml-default-exec-mode 'executable)
-  (plantuml-default-exec-mode 'jar)
-  (plantuml-output-type "svg")
-
-  :config
-  (defun plantuml-preview-frame (prefix)
-    (interactive "p")
-    (plantuml-preview 16))
-
-  )
-
 (use-package web-mode
   :ensure t
   :defer t
@@ -2073,7 +2041,7 @@ setInterval(() => {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
- '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
- '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
- '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue")))))
+ '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))) t)
+ '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))) t)
+ '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))) t)
+ '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
