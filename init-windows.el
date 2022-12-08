@@ -92,4 +92,43 @@
 ;; pageantで保存してあるセッション名を使う場合は、C-x C-f /plinkx:
 (setq-default tramp-default-method "plink")
 
+
+;; plantuml
+;; Need plantuml.jar and graphviz.
+;; C-c C-c preview
+;; C-mouse scroll change image size
+(use-package plantuml-mode
+  :ensure t
+  :mode (
+         ("\\.pu\\'" . plantuml-mode)
+         ("\\.plantuml\\'" . plantuml-mode)
+         )
+  :hook(
+        (plantuml-mode . (lambda ()
+                           (setq plantuml-executable-args
+                                 (append plantuml-executable-args '("-charset" "UTF-8"))
+                                 )
+                           )
+                       )
+        )
+
+  :custom
+  ;; (plantuml-executable-path "~/plantuml/plantuml")
+  (plantuml-jar-path "~/plantuml/plantuml.jar")
+  (plantuml-java-options "")
+  (plantuml-options "-charset UTF-8")
+  ;; (plantuml-default-exec-mode 'executable)
+  (plantuml-default-exec-mode 'jar)
+
+  :config
+  (defun plantuml-preview-frame (prefix)
+    (interactive "p")
+    (plantuml-preview 16))
+  ;; (setq plantuml-output-type "svg")
+  (setq plantuml-output-type "png")
+
+  )
+
+
+
 ;;; init-windows.el ends here
