@@ -661,9 +661,9 @@
   :ensure t
   )
 
-(use-package rg
-  :ensure t
-  )
+;; (use-package rg
+;;   :ensure t
+;;   )
 
 (use-package bash-completion
   :ensure t
@@ -832,8 +832,8 @@
          ("C-c b" . counsel-descbinds)
          ;; ディレクトリも再起的に検索するには、C-uを最初に打つ
          ;; the_silver_searcherかripgrepをOSにインストールしておく
-         ;; ("C-c g" . counsel-ag)
-         ("C-c g" . counsel-rg)
+         ("C-c g" . counsel-ag)
+         ;; ("C-c g" . counsel-rg)
          :map counsel-find-file-map
          ("C-l" . counsel-up-directory)
          )
