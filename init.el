@@ -1917,6 +1917,10 @@ setInterval(() => {
   ;; 長い文章を折り返す
   ;; (org-startup-truncated nil)
 
+  (org-latex-default-class "myltjsarticle")
+
+  (org-latex-compilers '("pdflatex" "xelatex" "lualatex" "uplatex"))
+
   ;; 勝手に入力される \hypersetup{} は使わない(usepackage の順序依存に配慮)
   (org-latex-with-hyperref nil)
 
@@ -1931,14 +1935,16 @@ setInterval(() => {
   (org-latex-title-command "\\maketitle")
   (org-latex-toc-command
    "\\tableofcontents \\clearpage")
+
   (org-latex-text-markup-alist '((bold . "\\textbf{%s}")
                                  (code . verb)
-                                 (italic . "\\it{%s}")
+                                 (italic . "\\textit{%s}")
                                  (strike-through . "\\sout{%s}")
                                  (underline . "\\uline{%s}")
                                  (verbatim . protectedtexttt)))
 
   (org-export-latex-listings t)
+
   (org-latex-listings 'minted)
   (org-latex-minted-options
    '(("frame" "lines")
@@ -1947,6 +1953,7 @@ setInterval(() => {
      ("baselinestretch=1.2")
      ("fontsize=\\footnotesize")
      ("breaklines")
+     ("bgcolor=srcbg")
      ))
 
   :config
@@ -1965,9 +1972,12 @@ setInterval(() => {
   (add-to-list 'org-latex-packages-alist "\\hypersetup{setpagesize=false}" t)
   (add-to-list 'org-latex-packages-alist "\\hypersetup{colorlinks=true}" t)
   (add-to-list 'org-latex-packages-alist "\\hypersetup{linkcolor=blue}" t)
+  ;; (add-to-list 'org-latex-packages-alist "\\hypersetup{pdfencoding=auto}" t)
 
   (require 'ox-latex)
+
   ;; インデントすると *.tex にそのまま入ってしまう
+  ;; org-modeがデフォルトで挿入するpackageを抑制する[NO-DEFAULT-PACKAGES]
   (with-eval-after-load 'ox-latex
     (add-to-list 'org-latex-classes
                  '("myjsarticle"
@@ -1992,7 +2002,37 @@ setInterval(() => {
   ("\\subsection{%s}" . "\\subsection*{%s}")
   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+    (add-to-list 'org-latex-classes
+                 '("myltjsarticle"
+                   "\\documentclass[titlepage,12pt,a4paper]{ltjsarticle}
+[NO-DEFAULT-PACKAGES]
+\\usepackage{ascmac}
+\\usepackage{amsfonts}
+\\usepackage{amssymb}
+\\usepackage{amsmath}
+\\usepackage[normalem]{ulem}
+\\usepackage{textcomp}
+\\usepackage{longtable}
+\\usepackage{wrapfig}
+\\usepackage{minted}
+\\usemintedstyle{emacs}
+\\usepackage{enumerate}
+\\usepackage{boites,boites_exemples,graphicx}
+\\usepackage{comment}
+\\usepackage{cancel}
+\\usepackage{xurl}
+\\usepackage{xcolor}
+\\usepackage{bookmark}
+\\definecolor{srcbg}{rgb}{0.95,0.95,0.95}
+\\hypersetup{unicode,bookmarksnumbered=true,hidelinks,final}"
+  ("\\section{%s}" . "\\section*{%s}")
+  ("\\subsection{%s}" . "\\subsection*{%s}")
+  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+    )
 
 
 
