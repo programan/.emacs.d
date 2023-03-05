@@ -1918,6 +1918,7 @@ setInterval(() => {
   ;; (org-startup-truncated nil)
 
   (org-latex-default-class "myltjsarticle")
+  (org-latex-prefer-user-labels t)
 
   (org-latex-compilers '("pdflatex" "xelatex" "lualatex" "uplatex"))
 
@@ -1997,6 +1998,7 @@ setInterval(() => {
 \\usepackage{wrapfig}
 \\usepackage[dvipdfmx]{hyperref}
 \\usepackage{pxjahyper}
+\\definecolor{srcbg}{rgb}{0.95,0.95,0.95}
 % \\hypersetup{pdfencoding=auto}"
   ("\\section{%s}" . "\\section*{%s}")
   ("\\subsection{%s}" . "\\subsection*{%s}")
