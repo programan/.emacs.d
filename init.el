@@ -677,8 +677,10 @@
   :ensure t
   :bind (("C-x j" . skk-mode))
   :init
-  (setq skk-byte-compile-init-file t
-        skk-init-file "~/.emacs.d/init-ddskk")
+  ;; (setq skk-byte-compile-init-file t
+  ;;       skk-init-file "~/.emacs.d/init-ddskk")
+  (setq skk-init-file "~/.emacs.d/init-ddskk")
+
   :custom
   (skk-user-directory "~/.ddskk")
   (default-input-method "japanese-skk")
