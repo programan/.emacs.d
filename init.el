@@ -815,6 +815,9 @@
   :ensure t
   )
 
+(use-package treemacs-all-the-icons
+  :ensure t
+  )
 
 (use-package all-the-icons-dired
   :ensure t
@@ -974,6 +977,7 @@
 
 
 (use-package neotree
+  :disabled t
   :ensure t
   :defer t
   :after (all-the-icons)
@@ -996,6 +1000,65 @@
   (neo-window-width 40)
   (neo-autorefresh t)
   )
+
+
+
+;; Cc Cw r  ワークスペースの名前を変更します
+;; Cc Cw a  新しいワークスペースを作成します
+;; Cc Cw d  ワークスペースを削除します
+;; Cc Cw s  現在のワークスペースを切り替えます
+;; Cc Cp a  ワークスペースに追加する新しいプロジェクトを選択します。
+;; Cc Cp p  ワークスペースに追加するprojectileプロジェクトを選択します。
+;; Cc Cp d  プロジェクトのポイントをワークスペースから削除します。
+;; Cc Cp r  ポイントでプロジェクトの名前を変更します。
+(use-package treemacs
+  ;; :disabled t
+  :ensure t
+  :defer t
+  :after (treemacs-all-the-icons)
+  :bind (
+         ([f8] . treemacs)
+         )
+  :config                                     ; 設定
+  (treemacs-load-theme "all-the-icons")
+  (progn
+    ;; treemacsの見た目の設定
+    (setq treemacs-width 40
+          treemacs-no-delete-other-windows t
+          treemacs-is-never-other-window t
+          treemacs-position 'left
+          treemacs-silent-refresh t
+          treemacs-silent-filewatch t
+          treemacs-filewatch-mode t
+          treemacs-show-cursor nil
+          treemacs-show-hidden-files t
+          treemacs-eldoc-display t
+          treemacs-follow-mode t
+          treemacs-tag-follow-mode t
+          treemacs-collapse-dirs 3)
+
+    ;; シンボルのフォント設定
+    (with-eval-after-load 'treemacs
+      (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action)
+      (treemacs-follow-mode t)
+      (treemacs-tag-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode t))
+    ))
+
+
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t
+  )
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config (treemacs-icons-dired-mode)
+  )
+
+
 
 (use-package dockerfile-mode
   :ensure t
