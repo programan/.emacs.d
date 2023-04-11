@@ -1666,6 +1666,7 @@ setInterval(() => {
          ("\\.tag\\.js\\'" . web-mode)
          ("\\.vue\\'" . web-mode)
          ("\\.erb\\'" . web-mode)
+         ("\\.blade\\.php\\'" . web-mode)
          )
   :custom
   ;; web-modeの設定
