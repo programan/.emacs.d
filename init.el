@@ -1135,6 +1135,10 @@
   (company-mode . company-quickhelp-mode)
   )
 
+(use-package company-php
+  :ensure t
+  :after (company)
+  )
 
 (use-package yasnippet
   :ensure t
@@ -1454,6 +1458,7 @@
          ;; (php-mode . my-php-flycheck-setup)
          )
   :config
+  (add-to-list 'company-backends 'company-php)
   )
 
 
@@ -2149,7 +2154,7 @@ setInterval(() => {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))) t)
- '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))) t)
- '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))) t)
+ '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
+ '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
+ '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
  '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
