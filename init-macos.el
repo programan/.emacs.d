@@ -47,6 +47,17 @@
 (define-key key-translation-map [165] [92])
 
 
+;; Emacs29になるまではsvgのエラー回避のためこの関数、設定を有効にしておく
+;; (defun image-type-available-p (type)
+;;   "Return t if image type TYPE is available.
+;; Image types are symbols like `xbm' or `jpeg'."
+;;   (if (eq 'svg type)
+;;       nil
+;;     (and (fboundp 'init-image-library)
+;;          (init-image-library type))))
+(add-to-list 'image-types 'svg)
+
+
 (use-package exec-path-from-shell
   :ensure t
   :config
