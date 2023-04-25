@@ -1036,6 +1036,7 @@
           treemacs-follow-mode t
           treemacs-tag-follow-mode t
           treemacs-collapse-dirs 3)
+    (setq treemacs-python-executable (executable-find "python"))
 
     ;; シンボルのフォント設定
     (with-eval-after-load 'treemacs
