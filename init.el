@@ -1024,6 +1024,7 @@
   (progn
     ;; treemacsの見た目の設定
     (setq treemacs-width 40
+          treemacs-width-is-initially-locked nil
           treemacs-no-delete-other-windows t
           treemacs-is-never-other-window t
           treemacs-position 'left
@@ -1036,7 +1037,12 @@
           treemacs-follow-mode t
           treemacs-tag-follow-mode t
           treemacs-collapse-dirs 3)
-    (setq treemacs-python-executable (executable-find "python"))
+
+    (when (eq system-type 'windows-nt)
+      (setq treemacs-python-executable (executable-find "python")))
+
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
 
     ;; シンボルのフォント設定
     (with-eval-after-load 'treemacs
