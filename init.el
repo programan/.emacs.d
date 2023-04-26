@@ -1693,6 +1693,8 @@ setInterval(() => {
   ;; タグを自動で閉じる
   (web-mode-enable-auto-pairing t)
   (web-mode-enable-auto-closing t)
+  (web-mode-auto-close-style 2)
+  (web-mode-tag-auto-close-style 2)
 
   :bind (
          :map web-mode-map
@@ -1735,7 +1737,6 @@ setInterval(() => {
   :defer t
   :mode (
          ("\\.js\\'" . js2-mode)
-         ;; ("\\.jsx\\'" . js2-jsx-mode)
          )
   :hook (
          (js2-mode . electric-pair-mode)
@@ -1758,6 +1759,15 @@ setInterval(() => {
   (advice-add #'js2-identifier-start-p
               :after-until
               (lambda (c) (eq c ?#)))
+  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
+  ;; js2-modeではバックアップファイルを作らない
+  ;; lspがimportのパスをバックアップファイルのパスで書き換えるのを防ぐ
+  (add-hook 'js2-mode-hook (lambda () (setq backup-inhibited t)))
+  (add-hook 'js2-mode-hook
+          (lambda ()
+            (interactive)
+            (mmm-mode)
+            ))
   )
 
 (use-package rjsx-mode
@@ -1779,6 +1789,11 @@ setInterval(() => {
   (js-indent-align-list-continuation t)
   ;; (js-indent-align-list-continuation nil)
   (js2r-prefered-quote-type 2)
+
+  :config
+  (add-hook 'rjsx-mode-hook (lambda () (setq js2-basic-offset 2)))
+  ;; rjsx-modeではバックアップファイルを作らない
+  (add-hook 'rjsx-mode-hook (lambda () (setq backup-inhibited t)))
   )
 
 
@@ -1803,6 +1818,15 @@ setInterval(() => {
          )
   )
 
+;; Prettierの自動フォーマッター
+(use-package prettier-js
+  :ensure t
+  :hook ((js2-mode . prettier-js-mode)
+         ;; (rjsx-mode . prettier-js-mode)
+         )
+  )
+
+
 (use-package python-mode
   :ensure t
   :mode (
@@ -1826,23 +1850,48 @@ setInterval(() => {
   :mode (
          ("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode)
+         ("\\.js\\'" . js2-mode)
          )
 
   :custom
   (mmm-global-mode t)
-  (mmm-submode-decoration-level 0)
+  (mmm-submode-decoration-level 1)
 
   :config
   (mmm-add-classes
+   ;; '((mmm-jsx-mode
+   ;;    :submode web-mode
+   ;;    :face mmm-code-submode-face
+   ;;    :front "\\((\\)[[:space:]\n]*<"
+   ;;    :front-match 1
+   ;;    :front-offset 1
+   ;;    :back ">[[:space:]\n]*\\()\\)"
+   ;;    :back-match 1
+   ;;    :back-offset 1
+   ;;    )))
    '((mmm-jsx-mode
       :submode web-mode
       :face mmm-code-submode-face
-      :front "\\(return\s\\|n\s\\|(\n\s*\\)<"
-      :front-offset -1
-      :back ">\n?\s*)\n}\n"
-      :back-offset 1
+      ;; :front "\\(return\s\\|n\s\\|[^n]\\)<[a-zA-Z]+[^>]*>.*?\\(</[a-zA-Z]+>\\|$\\)"
+      :front "\\((\\)[[:space:]\n]*<"
+      :front-offset -2
+      ;; :back "<\/[a-zA-Z]+>"
+      :back ">[[:space:]\n]*\\()\\)"
+      :back-offset -2
+      :end-not-begin t
       )))
+   ;; '((mmm-jsx-mode
+   ;;    :submode web-mode
+   ;;    :face mmm-code-submode-face
+   ;;    :front "\\(return\s\\|n\s\\|(\n\s*\\)<"
+   ;;    :front-offset -1
+   ;;    :back ">\n?\s*)\n}\n"
+   ;;    :back-offset 1
+   ;;    )))
+
   (mmm-add-mode-ext-class 'typescript-mode nil 'mmm-jsx-mode)
+  ;; (mmm-add-mode-ext-class 'js2-mode "\\.jsx\\'" 'jsx)
+  (mmm-add-mode-ext-class 'js2-mode nil 'mmm-jsx-mode)
 
   (defun mmm-reapply ()
     (mmm-mode)
@@ -1872,22 +1921,25 @@ setInterval(() => {
 ;; https://emacs-lsp.github.io/lsp-mode/page/installation/
 (use-package lsp-mode
   :ensure t
+  :commands (lsp lsp-deferred)
   :hook(
         ;; npm i -g typescript-language-server; npm i -g typescript
-        (js2-mode . lsp)
-        (typescript-mode . lsp)
+        (js-mode . lsp-deferred)
+        (js2-mode . lsp-deferred)
+        (rjsx-mode . lsp-deferred)
+        (typescript-mode . lsp-deferred)
         ;; npm i -g pyright
-        (python-mode . lsp)
+        (python-mode . lsp-deferred)
         ;; composer global require jetbrains/phpstorm-stubs:dev-master
         ;; composer global require felixfbecker/language-server
         ;; または各プロジェクト毎にcomposer.jsonを用意してcomposer install
         ;; npmで提供されているlsp npm i -g intelephense
         ;; intelephenseの方が安定している感じ
-        (php-mode . lsp)
+        (php-mode . lsp-deferred)
         ;; npm i -g bash-language-server
-        (sh-mode . lsp)
+        (sh-mode . lsp-deferred)
         ;; gem install solargraph
-        (ruby-mode . lsp)
+        (ruby-mode . lsp-deferred)
         )
   :custom
   (lsp-auto-configure t)
@@ -1900,13 +1952,17 @@ setInterval(() => {
   (lsp-headerline-breadcrumb-enable t)
   (lsp-headerline-breadcrumb-segments '(project file symbols))
 
-  :commands (lsp lsp-deferred)
+  ;; dockerのvolumeで共有されたファイルを扱う場合にLSPサーバーがファイルを検知して起動しなくなるのを防ぐ
+  ;; (lsp-enable-file-watchers nil)
+  ;; (lsp-file-watch-threshold nil)
+
   :config
   ;; watch 対象から外すリスト
   (dolist (dir '(
                  "[/\\\\]\\.venv$"
                  "[/\\\\]\\.mypy_cache$"
                  "[/\\\\]__pycache__$"
+                 "[/\\\\]\\.node_modules$"
                  ))
     (push dir lsp-file-watch-ignored))
   )
@@ -2161,7 +2217,7 @@ setInterval(() => {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
- '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
- '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
+ '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))) t)
+ '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))) t)
+ '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))) t)
  '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
