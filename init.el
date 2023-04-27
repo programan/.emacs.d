@@ -1696,6 +1696,13 @@ setInterval(() => {
   (web-mode-auto-close-style 2)
   (web-mode-tag-auto-close-style 2)
 
+  ;; 拡張子がjs,jsxのファイルはJavaScriptとして解釈させる
+  ;; (web-mode-content-types-alist
+  ;;  '(
+  ;;    ("jsx" . "\\.js[x]?\\'")
+  ;;    ;; ("js2" . "\\.js[x]?\\'")
+  ;;    ))
+
   :bind (
          :map web-mode-map
               ("C-;" . nil)
@@ -1763,11 +1770,13 @@ setInterval(() => {
   ;; js2-modeではバックアップファイルを作らない
   ;; lspがimportのパスをバックアップファイルのパスで書き換えるのを防ぐ
   (add-hook 'js2-mode-hook (lambda () (setq backup-inhibited t)))
-  (add-hook 'js2-mode-hook
-          (lambda ()
-            (interactive)
-            (mmm-mode)
-            ))
+
+  ;; mmm-modeも起動
+  ;; (add-hook 'js2-mode-hook
+  ;;         (lambda ()
+  ;;           (interactive)
+  ;;           (mmm-mode)
+  ;;           ))
   )
 
 (use-package rjsx-mode
@@ -1819,6 +1828,7 @@ setInterval(() => {
   )
 
 ;; Prettierの自動フォーマッター
+;; npm i -g prettier
 (use-package prettier-js
   :ensure t
   :hook ((js2-mode . prettier-js-mode)
@@ -1850,7 +1860,7 @@ setInterval(() => {
   :mode (
          ("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode)
-         ("\\.js\\'" . js2-mode)
+         ;; ("\\.js\\'" . js2-mode)
          )
 
   :custom
@@ -1868,7 +1878,7 @@ setInterval(() => {
    ;;    :back ">[[:space:]\n]*\\()\\)"
    ;;    :back-match 1
    ;;    :back-offset 1
-   ;;    )))
+   ;;    ))
    '((mmm-jsx-mode
       :submode web-mode
       :face mmm-code-submode-face
@@ -1879,19 +1889,12 @@ setInterval(() => {
       :back ">[[:space:]\n]*\\()\\)"
       :back-offset -2
       :end-not-begin t
-      )))
-   ;; '((mmm-jsx-mode
-   ;;    :submode web-mode
-   ;;    :face mmm-code-submode-face
-   ;;    :front "\\(return\s\\|n\s\\|(\n\s*\\)<"
-   ;;    :front-offset -1
-   ;;    :back ">\n?\s*)\n}\n"
-   ;;    :back-offset 1
-   ;;    )))
+      ))
+   )
 
   (mmm-add-mode-ext-class 'typescript-mode nil 'mmm-jsx-mode)
   ;; (mmm-add-mode-ext-class 'js2-mode "\\.jsx\\'" 'jsx)
-  (mmm-add-mode-ext-class 'js2-mode nil 'mmm-jsx-mode)
+  ;; (mmm-add-mode-ext-class 'js2-mode nil 'mmm-jsx-mode)
 
   (defun mmm-reapply ()
     (mmm-mode)
