@@ -767,6 +767,24 @@
   ;;  '(git-gutter:disabled-modes '(js2-mode image-mode)))
   )
 
+;; Git Lens
+(use-package blamer
+  :ensure t
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-min-offset 70)
+  (blamer-pretty-time-p t)
+  (blamer-author-formatter "✎ %s ")
+  (blamer-datetime-formatter "[%s] ")
+  (blamer-commit-formatter "● %s")
+  (blamer-type 'visual)
+  :hook (
+         (prog-mode . blamer-mode)
+         (text-mode . blamer-mode)
+         )
+  ;; :config
+  ;; (global-blamer-mode 1)
+  )
 
 ;; recentf
 (use-package recentf
@@ -2220,7 +2238,7 @@ setInterval(() => {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))) t)
- '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))) t)
- '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))) t)
+ '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
+ '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
+ '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
  '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
