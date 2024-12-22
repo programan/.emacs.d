@@ -1,11 +1,10 @@
-;;; .yas-setup.el --- Yasnippet helper functions for JSX snippets
+;;; .yas-setup.el --- Yasnippet helper functions for JSX snippets -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
 ;;; Code:
 
 (require 'yasnippet)
-(require 's)
 
 (defun yas-jsx-get-class-name-by-file-name ()
   "Return name of class-like construct by `file-name'."
@@ -17,5 +16,9 @@
              (directory-file-name (file-name-directory buffer-file-name)))
           class-name))
     ""))
+
+(defun yas-snake-case (s)
+  "Convert S to snake-case."
+  (mapconcat #'upcase (split-string s "[^[:word:]0-9]+" t) "_"))
 
 ;;; .yas-setup.el ends here
