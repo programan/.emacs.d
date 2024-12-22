@@ -1742,12 +1742,6 @@ setInterval(() => {
   )
 
 
-(use-package linum
-  :custom
-  (linum-format "%4d \u2502 ")
-  )
-
-
 (use-package auto-complete
   :ensure t
   :defer t
