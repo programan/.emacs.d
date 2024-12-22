@@ -347,6 +347,9 @@
   :config
   )
 
+(use-package posframe
+  :ensure t)
+
 (use-package auto-package-update
   :ensure t
   ;; :disabled t
@@ -770,14 +773,23 @@
 ;; Git Lens
 (use-package blamer
   :ensure t
+  :after (posframe)
   :custom
-  (blamer-idle-time 0.3)
+  (blamer-idle-time 0.5)
   (blamer-min-offset 70)
   (blamer-pretty-time-p t)
-  (blamer-author-formatter "✎ %s ")
-  (blamer-datetime-formatter "[%s] ")
-  (blamer-commit-formatter "● %s")
-  (blamer-type 'visual)
+  ;; (blamer-author-formatter "✎ %s ")
+  ;; (blamer-datetime-formatter "[%s] ")
+  ;; (blamer-commit-formatter "● %s")
+  ;; (blamer--overlay-popup-position 'top)
+  ;; (blamer-type 'visual)
+  ;; (blamer-type 'posframe-popup)
+  ;; (blamer-type 'overlay-popup)
+  (blamer-type 'selected)
+  (blamer-face ((t :foreground "#7a88cf"
+                    :background nil
+                    :height 140
+                    :italic t)))
   :hook (
          (prog-mode . blamer-mode)
          (text-mode . blamer-mode)
@@ -1303,10 +1315,13 @@
 (use-package color-identifiers-mode
   :ensure t
   :diminish color-identifiers-mode
-  :hook (
-         (prog-mode . color-identifiers-mode)
-         )
+  ;; :hook (
+  ;;        (prog-mode . color-identifiers-mode)
+  ;;        )
+  :config
+  (add-hook 'after-init-hook 'global-color-identifiers-mode)
   )
+
 
 (use-package highlight-indent-guides
   :ensure t
