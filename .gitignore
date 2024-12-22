@@ -17,6 +17,7 @@ auto-save-list/
 .cache
 transient/
 lsp-cache/
+org-persist/
 
 # Data files
 ac-comphist.dat
