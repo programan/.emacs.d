@@ -190,7 +190,7 @@
      ;;              :underline "gray24"))
      ;; (:background nil
      ;;              :underline "RoyalBlue1"))
-     (:background nil
+     (:background unspecified
                   :underline "dark slate blue"))
 
     (((class color)
@@ -533,7 +533,7 @@
                       :underline nil)
 
   (set-face-attribute 'whitespace-newline nil
-                      :background nil
+                      :background 'unspecified
                       :foreground "DimGray"
                       :underline nil)
 
