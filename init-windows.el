@@ -20,7 +20,9 @@
 (add-hook
  'shell-mode-hook
  #'(lambda ()
-   (set-buffer-process-coding-system 'sjis 'sjis)))
+     ;; (set-buffer-process-coding-system 'sjis 'sjis))
+     (set-buffer-process-coding-system 'utf-8 'utf-8))
+ )
 
 ;; Cygwin入ってる場合に設定しておくとfind grep使える
 ;; (setq find-dired-find-program "c:\\cygwin\\bin\\find.exe")
@@ -31,8 +33,32 @@
 ;; (setq find-program "c:\\MinGW\\msys\\1.0\\bin\\find.exe")
 ;; (setenv "PATH" (format "c:\\MinGW\\msys\\1.0\\bin;%s" (getenv "PATH")))
 
-;(setq exec-path (append exec-path '(getenv "PATH")))
-;(setq exec-path (append exec-path '(format "c:/cygwin/bin;%s" (getenv "PATH"))))
+;; (setq exec-path (append exec-path '(getenv "PATH")))
+;; (setq exec-path (append exec-path '(format "c:/cygwin/bin;%s" (getenv "PATH"))))
+
+;; PowerShell使う
+(setq shell-file-name "powershell.exe")
+(setq explicit-shell-file-name "powershell.exe")
+(setq explicit-powershell.exe-args '("-NoLogo"))
+
+;; Diffはwslのものを使う
+;; -> 下記のどれもうまくいかない
+;; scoopでdiffutils入れた
+;; (setq diff-command "wsl diff")
+;; (setq diff-command "C:/Windows/System32/wsl.exe diff")
+;; (setq ediff-diff-program "C:/Windows/System32/wsl.exe diff")
+
+;; (setq diff-command "C:/Windows/System32/wsl.exe")
+;; (setq diff-switches '("diff"))
+
+;; (defun run-wsl-diff (old new &optional switches)
+;;   "Run diff via WSL."
+;;   (let ((diff-command "C:/Windows/System32/wsl.exe")
+;;         (diff-args (append '("diff") (split-string (or switches "")) (list old new))))
+;;     (apply #'call-process diff-command nil "*diff-output*" nil diff-args)))
+
+;; (setq diff-command #'run-wsl-diff)
+
 
 ;; シフト + 矢印で範囲選択
 (setq pc-select-selection-keys-only t)
