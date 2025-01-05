@@ -325,6 +325,8 @@
 
 ;; warn when opening files bigger than 200MB
 (setq large-file-warning-threshold 200000000)
+;; gc 12MB
+(setq gc-cons-threshold 12000000)
 
 
 ;;(remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
@@ -720,9 +722,13 @@
    '((nil          . (telephone-line-input-info-segment))
      (important    . (telephone-line-major-mode-segment))
      (information  . (telephone-line-vc-segment))
-     (nil          . (telephone-line-projectile-buffer-segment
+     ;; (nil          . (telephone-line-projectile-buffer-segment
+     ;;                  telephone-line-position-segment
+     ;;                  telephone-line-filesize-segment))
+     (nil          . (telephone-line-buffer-name-segment
                       telephone-line-position-segment
-                      telephone-line-filesize-segment))))
+                      telephone-line-filesize-segment))
+     ))
   ;; 右側で表示するコンテンツの設定
   (telephone-line-rhs
    '((warning      .       (telephone-line-flycheck-segment))
@@ -1102,6 +1108,11 @@
   :mode
   ("Dockerfile\\'" . dockerfile-mode))
 
+(use-package company-php
+  :ensure t
+  ;; :after (company)
+  )
+
 (use-package company
   :ensure t
   :diminish company-mode
@@ -1161,7 +1172,7 @@
                                     company-gtags
                                     company-etags
                                     company-keywords)
-                                   company-oddmuse company-dabbrev company-capf)))
+                                   company-oddmuse company-dabbrev company-capf company-ac-php-backend)))
   )
 
 
@@ -1170,11 +1181,6 @@
   :after (company)
   :hook
   (company-mode . company-quickhelp-mode)
-  )
-
-(use-package company-php
-  :ensure t
-  :after (company)
   )
 
 (use-package yasnippet
@@ -1475,6 +1481,10 @@
   )
 
 
+(use-package php-cs-fixer
+  :ensure t
+  )
+
 (use-package php-mode
   :ensure t
   ;; :pin melpa-stable
@@ -1498,7 +1508,10 @@
          ;; (php-mode . my-php-flycheck-setup)
          )
   :config
-  (add-to-list 'company-backends 'company-php)
+  ;; (add-to-list 'company-backends 'company-php)
+  ;; 保存時に実行
+  ;; php-cs-fixerが古くて.php-cs-fixer.dist.phpを認識しないかも
+  ;; (add-hook 'before-save-hook 'php-cs-fixer-before-save)
   )
 
 
@@ -2214,6 +2227,7 @@ setInterval(() => {
   )
 
 (use-package geben
+  :disabled t
   ;; :pin melpa
   ;; package-list-packagesでインストールしないと失敗する
   ;; :ensure t
@@ -2234,7 +2248,9 @@ setInterval(() => {
  '(mouse-wheel-follow-mouse t)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(5 ((shift) . 1)))
- '(package-selected-packages '(geben use-package))
+ '(org-latex-hyperref-template nil nil nil "Customized with use-package org")
+ '(org-latex-src-block-backend 'minted nil nil "Customized with use-package org")
+ '(package-selected-packages '(use-package))
  '(python-indent-offset 4 nil nil "Customized with use-package python-mode")
  '(scroll-step 1)
  '(tron-legacy-theme-dark-fg-bright-comments t)
@@ -2250,4 +2266,4 @@ setInterval(() => {
  '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
  '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
  '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
- '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
+ '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue")))))
