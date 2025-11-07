@@ -781,26 +781,31 @@
   :ensure t
   :after (posframe)
   :custom
-  (blamer-idle-time 0.5)
+  (blamer-idle-time 0.3)
   (blamer-min-offset 70)
   (blamer-pretty-time-p t)
   ;; (blamer-author-formatter "✎ %s ")
   ;; (blamer-datetime-formatter "[%s] ")
   ;; (blamer-commit-formatter "● %s")
   ;; (blamer--overlay-popup-position 'top)
-  ;; (blamer-type 'visual)
+  (blamer-type 'visual)
   ;; (blamer-type 'posframe-popup)
   ;; (blamer-type 'overlay-popup)
-  (blamer-type 'selected)
+  ;; (blamer-type 'selected)
   (blamer-face ((t :foreground "#7a88cf"
                     :background nil
                     :height 140
                     :italic t)))
+  (blamer-show-avatar-p nil)
+  (blamer-enable-async-execution-p nil)
+  (blamer-max-commit-message-length 100)
   :hook (
          (prog-mode . blamer-mode)
          (text-mode . blamer-mode)
          )
-  ;; :config
+  :config
+  (defun blamer--get-local-name (filename)
+    filename)
   ;; (global-blamer-mode 1)
   )
 
@@ -1057,6 +1062,8 @@
          )
   :config                                     ; 設定
   (treemacs-load-theme "all-the-icons")
+  (treemacs-indent-guide-mode t)
+  ;; (treemacs-indent-guide-style 'line)
   (progn
     ;; treemacsの見た目の設定
     (setq treemacs-width 40
@@ -1073,6 +1080,8 @@
           treemacs-follow-mode t
           treemacs-tag-follow-mode t
           treemacs-collapse-dirs 3)
+
+    ;; (setq treemacs-indent-guide-style #'block)
 
     (when (eq system-type 'windows-nt)
       (setq treemacs-python-executable (executable-find "python")))
