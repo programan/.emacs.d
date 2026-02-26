@@ -878,7 +878,8 @@
          ("C-c b" . counsel-descbinds)
          ;; ディレクトリも再起的に検索するには、C-uを最初に打つ
          ;; the_silver_searcherかripgrepをOSにインストールしておく
-         ("C-c g" . counsel-ag)
+         ;; ("C-c g" . counsel-ag)
+         ("C-c g" . counsel-rg)
          ;; ("C-c g" . counsel-rg)
          :map counsel-find-file-map
          ("C-l" . counsel-up-directory)
@@ -936,8 +937,20 @@
                               ((s-matches? sep it) it)
                               (t (migemo-get-pattern it)))
                         splitted))))
-  (setq ivy-re-builders-alist '((t . ivy--regex-plus)
-                                (swiper . my:ivy-migemo-re-builder)))
+
+  ;; (setq ivy-re-builders-alist '((t . ivy--regex-plus)
+  ;;                               (swiper . my:ivy-migemo-re-builder)))
+
+
+  (setq ivy-re-builders-alist
+        '((swiper . my:ivy-migemo-re-builder)
+          ;; ProjectileとCounsel関連をFuzzy（あいまい）検索にする
+          (projectile-find-file . ivy--regex-fuzzy)
+          (counsel-projectile-find-file . ivy--regex-fuzzy)
+          (counsel-projectile-switch-project . ivy--regex-fuzzy)
+          ;; その他（M-x等）はこれまで通り ivy--regex-plus
+          (t . ivy--regex-plus)))
+
 
   (ivy-mode 1)
   )
@@ -968,14 +981,35 @@
 (use-package projectile
   :ensure t
   :diminish projectile-mode
+  :init
+  (setq projectile-completion-system 'ivy)
+
+  ;; Windowsの場合scoopで入れているコマンドを使えるように
+  (when (eq system-type 'windows-nt)
+    (let ((scoop-shim-dir (expand-file-name "scoop/shims" (getenv "USERPROFILE"))))
+      (when (file-directory-p scoop-shim-dir)
+        ;; 1. Emacsが外部プロセスを起動する際のPATHの先頭に追加
+        (setenv "PATH" (concat scoop-shim-dir ";" (getenv "PATH")))
+        ;; 2. Emacs自身の実行ファイル検索パスの先頭に追加
+        (add-to-list 'exec-path scoop-shim-dir))))
 
   :bind-keymap (
                 ("s-p" . projectile-command-map)
                 ("C-c p" . projectile-command-map)
                 )
 
-  ;; :config
+  :config
   ;; (projectile-mode +1)
+  (setq projectile-indexing-method 'alien)
+
+  ;; Windows環境でのfindコマンド衝突を回避(scoopでfindutils,coreutils,diffutils入れてる前提)
+  (when (eq system-type 'windows-nt)
+    (setq projectile-generic-command "find . -type f"))
+
+  ; diredを開く
+  ;; (setq projectile-switch-project-action 'projectile-dired)
+  ; すぐにファイル検索を始める
+  (setq projectile-switch-project-action 'projectile-find-file)
 
   :hook (
          (prog-mode . projectile-mode)
@@ -1003,8 +1037,19 @@
 
 (use-package counsel-projectile
   :ensure t
+  :after (projectile counsel)
   :config
-  (counsel-projectile-mode)
+  (counsel-projectile-mode 1)
+  ;; Projectileの検索コマンドをcounsel系に置き換え
+  ;; :bind (
+  ;;        :map projectile-command-map
+  ;;             ("f" . counsel-projectile-find-file)
+  ;;             ("p" . counsel-projectile-switch-project)
+  ;;             ("s r" . counsel-projectile-rg) ; プロジェクト内rg検索
+  ;;             )
+
+  ;; プロジェクト内検索で常に ripgrep を使うようにする
+  (setq counsel-projectile-grep-initial-input "")
   )
 
 
@@ -1060,29 +1105,33 @@
   :bind (
          ([f8] . treemacs)
          )
-  :config                                     ; 設定
+  :config
   (treemacs-load-theme "all-the-icons")
-  (treemacs-indent-guide-mode t)
   ;; (treemacs-indent-guide-style 'line)
+  ;; (setq treemacs-indent-guide-style #'block)
+
+  ;; treemacsの見た目の設定
+  (setq treemacs-width 40
+        treemacs-width-is-initially-locked nil
+        treemacs-no-delete-other-windows t
+        treemacs-is-never-other-window t
+        treemacs-position 'left
+        treemacs-silent-refresh t
+        treemacs-silent-filewatch t
+        treemacs-filewatch-mode t
+        treemacs-show-cursor nil
+        treemacs-show-hidden-files t
+        treemacs-eldoc-display t
+        treemacs-collapse-dirs 3)
+
+  ;; 各種マイナーモードの一括有効化
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode t)
+  (treemacs-indent-guide-mode t)
+  (treemacs-tag-follow-mode t)
+
   (progn
-    ;; treemacsの見た目の設定
-    (setq treemacs-width 40
-          treemacs-width-is-initially-locked nil
-          treemacs-no-delete-other-windows t
-          treemacs-is-never-other-window t
-          treemacs-position 'left
-          treemacs-silent-refresh t
-          treemacs-silent-filewatch t
-          treemacs-filewatch-mode t
-          treemacs-show-cursor nil
-          treemacs-show-hidden-files t
-          treemacs-eldoc-display t
-          treemacs-follow-mode t
-          treemacs-tag-follow-mode t
-          treemacs-collapse-dirs 3)
-
-    ;; (setq treemacs-indent-guide-style #'block)
-
     (when (eq system-type 'windows-nt)
       (setq treemacs-python-executable (executable-find "python")))
 
@@ -1091,11 +1140,7 @@
 
     ;; シンボルのフォント設定
     (with-eval-after-load 'treemacs
-      (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action)
-      (treemacs-follow-mode t)
-      (treemacs-tag-follow-mode t)
-      (treemacs-filewatch-mode t)
-      (treemacs-fringe-indicator-mode t))
+      (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action))
     ))
 
 
