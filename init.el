@@ -380,6 +380,7 @@
   (scroll-step 1)                                       ;; keyboard scroll one line at a time
   )
 
+;; windowsの場合はuniversal-ctagsを入れる
 (use-package ctags-update
   :ensure t
   :defer t
@@ -779,35 +780,77 @@
 ;; Git Lens
 (use-package blamer
   :ensure t
-  :after (posframe)
+  :after posframe
   :custom
-  (blamer-idle-time 0.3)
+  (blamer-idle-time 1.5)
   (blamer-min-offset 70)
   (blamer-pretty-time-p t)
-  ;; (blamer-author-formatter "✎ %s ")
-  ;; (blamer-datetime-formatter "[%s] ")
-  ;; (blamer-commit-formatter "● %s")
-  ;; (blamer--overlay-popup-position 'top)
-  (blamer-type 'visual)
-  ;; (blamer-type 'posframe-popup)
-  ;; (blamer-type 'overlay-popup)
-  ;; (blamer-type 'selected)
-  (blamer-face ((t :foreground "#7a88cf"
-                    :background nil
-                    :height 140
-                    :italic t)))
   (blamer-show-avatar-p nil)
-  (blamer-enable-async-execution-p nil)
-  (blamer-max-commit-message-length 100)
-  :hook (
-         (prog-mode . blamer-mode)
-         (text-mode . blamer-mode)
-         )
+  (blamer-type 'posframe-popup)
+  (blamer-view 'posframe)
   :config
-  (defun blamer--get-local-name (filename)
-    filename)
-  ;; (global-blamer-mode 1)
-  )
+  ;; (setq blamer-posframe-parameters
+  ;;       '(:internal-border-width 2
+  ;;         :internal-border-color "#7a88cf"
+  ;;         :poshandler posframe-poshandler-p0.5-to-p0.5-top-center))
+  (setq blamer-enable-async-execution-p t)
+  (global-blamer-mode 1))
+
+;; (use-package blamer
+;;   :ensure t
+;;   :after (posframe)
+;;   ;; :bind (("C-c g b" . blamer-show-posframe-commit-info))
+;;   :custom
+;;   ;; (blamer-idle-time 0.3)
+;;   (blamer-idle-time 0.3)
+;;   (blamer-min-offset 70)
+;;   (blamer-pretty-time-p t)
+;;   ;; (blamer-author-formatter "✎ %s ")
+;;   ;; (blamer-datetime-formatter "[%s] ")
+;;   ;; (blamer-commit-formatter "● %s")
+;;   ;; (blamer-type 'visual)
+;;   (blamer-type 'posframe-popup)
+;;   ;; (blamer-type 'overlay-popup)
+;;   ;; (blamer--overlay-popup-position 'top)
+;;   ;; (blamer-type 'selected)
+;;   ;; (blamer-face ((t :foreground "#7a88cf"
+;;   ;;                   :background nil
+;;   ;;                   :height 100
+;;   ;;                   :italic t)))
+
+;;   (blamer-show-avatar-p nil)
+;;   ;; (blamer-show-avatar-p t)
+;;   (blamer-max-commit-message-length 100)
+
+;;   ;; :custom-face
+;;   ;; (blamer-face ((t :foreground "#7a88cf"
+;;   ;;                  :background unspecified
+;;   ;;                  :height 100
+;;   ;;                  :italic t)))
+  
+;;   :hook (
+;;          (prog-mode . blamer-mode)
+;;          (text-mode . blamer-mode)
+;;          )
+
+;;   :config
+;;   ;; 自動表示タイマーが使う表示形式を確実に指定
+;;   ;; (setq blamer-type 'posframe-popup)
+
+;;   (setq blamer-posframe-parameters
+;;         '(:internal-border-width 2
+;;                                  :internal-border-color "#7a88cf"
+;;                                  :poshandler posframe-poshandler-p0.5-to-p0.5-top-center))
+
+;;   ;; 非同期実行
+;;   (setq blamer-enable-async-execution-p t)
+
+;;   (defun blamer--get-local-name (filename)
+;;     filename)
+
+;;   ;; (global-blamer-mode -1)
+;;   ;; (global-blamer-mode 1)
+;;   )
 
 ;; recentf
 (use-package recentf
@@ -887,6 +930,16 @@
   :config
   (counsel-mode 1)
   )
+
+(use-package counsel-etags
+  :ensure t
+  :disabled t
+  :bind ("M-." . counsel-etags-find-tag-at-point)
+  :config
+  ;; 保存時に自動でctagsを更新する設定（任意）
+  ;; (add-hook 'after-save-hook 'counsel-etags-virtual-update-tags)
+  ;; 大きすぎるファイル（1MB以上など）を無視して高速化
+  (setq counsel-etags-max-file-size 1024))
 
 (use-package swiper
   :ensure t
@@ -1000,7 +1053,13 @@
 
   :config
   ;; (projectile-mode +1)
-  (setq projectile-indexing-method 'alien)
+  ;; rgとかagとか
+  ;; (setq projectile-indexing-method 'alien)
+
+  ;; emacsの機能のみ
+  (setq projectile-indexing-method 'native)
+  (setq projectile-enable-caching t)
+  (setq projectile-refresh-cache-file-on-switch t)
 
   ;; Windows環境でのfindコマンド衝突を回避(scoopでfindutils,coreutils,diffutils入れてる前提)
   (when (eq system-type 'windows-nt)
@@ -1105,10 +1164,21 @@
   :bind (
          ([f8] . treemacs)
          )
+  :hook (
+         (treemacs-mode . my/treemacs-custom-font)
+         )
   :config
+  (defun my/treemacs-custom-font ()
+    "Treemacsのフォントサイズを小さく設定する"
+    (setq-local face-remapping-alist
+                '((default (:height 0.8) default)))) ; 0.8は標準の80%の
+
   (treemacs-load-theme "all-the-icons")
-  ;; (treemacs-indent-guide-style 'line)
-  ;; (setq treemacs-indent-guide-style #'block)
+
+  ;; (setq treemacs-indent-guide-style 'block)
+  (setq treemacs-indent-guide-style 'line)
+  (setq treemacs-indent-guide-width 1)
+
 
   ;; treemacsの見た目の設定
   (setq treemacs-width 40
@@ -1129,7 +1199,9 @@
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode t)
   (treemacs-indent-guide-mode t)
-  (treemacs-tag-follow-mode t)
+  ;; ファイル内部の関数などの展開
+  ;; (treemacs-tag-follow-mode t)
+  (treemacs-tag-follow-mode -1)
 
   (progn
     (when (eq system-type 'windows-nt)
@@ -2304,7 +2376,7 @@ setInterval(() => {
  '(mouse-wheel-scroll-amount '(5 ((shift) . 1)))
  '(org-latex-hyperref-template nil nil nil "Customized with use-package org")
  '(org-latex-src-block-backend 'minted nil nil "Customized with use-package org")
- '(package-selected-packages '(use-package))
+ '(package-selected-packages nil)
  '(python-indent-offset 4 nil nil "Customized with use-package python-mode")
  '(scroll-step 1)
  '(tron-legacy-theme-dark-fg-bright-comments t)
@@ -2320,4 +2392,4 @@ setInterval(() => {
  '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
  '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
  '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
- '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue")))))
+ '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
