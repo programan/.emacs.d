@@ -780,77 +780,60 @@
 ;; Git Lens
 (use-package blamer
   :ensure t
-  :after posframe
+  :after (posframe)
+  ;; :defer 20
+  :bind (
+         ("C-c i" . blamer-show-posframe-commit-info)
+         )
   :custom
-  (blamer-idle-time 1.5)
+  (blamer-idle-time 0.5)
   (blamer-min-offset 70)
   (blamer-pretty-time-p t)
-  (blamer-show-avatar-p nil)
+  ;; (blamer-author-formatter "✎ %s ")
+  ;; (blamer-datetime-formatter "[%s] ")
+  ;; (blamer-commit-formatter "● %s")
+  ;; (blamer-type 'visual)
+  ;; posframeだけidle-timeをトリガーとして表示されない
   (blamer-type 'posframe-popup)
-  (blamer-view 'posframe)
+  ;; (blamer-type 'overlay-popup)
+  ;; (blamer--overlay-popup-position 'top)
+  ;; (blamer-type 'selected)
+
+  (blamer-show-avatar-p nil)
+  ;; (blamer-show-avatar-p t)
+  (blamer-max-commit-message-length 100)
+
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                   :background unspecified
+                   :height 100
+                   :italic t)))
+
+  :hook (
+         (prog-mode . blamer-mode)
+         (text-mode . blamer-mode)
+         )
+
   :config
-  ;; (setq blamer-posframe-parameters
-  ;;       '(:internal-border-width 2
-  ;;         :internal-border-color "#7a88cf"
-  ;;         :poshandler posframe-poshandler-p0.5-to-p0.5-top-center))
-  (setq blamer-enable-async-execution-p t)
-  (global-blamer-mode 1))
+  (setq blamer-posframe-parameters
+        '(:internal-border-width 2
+                                 :internal-border-color "#7a88cf"
+                                 :poshandler posframe-poshandler-p0.5-to-p0.5-top-center))
 
-;; (use-package blamer
-;;   :ensure t
-;;   :after (posframe)
-;;   ;; :bind (("C-c g b" . blamer-show-posframe-commit-info))
-;;   :custom
-;;   ;; (blamer-idle-time 0.3)
-;;   (blamer-idle-time 0.3)
-;;   (blamer-min-offset 70)
-;;   (blamer-pretty-time-p t)
-;;   ;; (blamer-author-formatter "✎ %s ")
-;;   ;; (blamer-datetime-formatter "[%s] ")
-;;   ;; (blamer-commit-formatter "● %s")
-;;   ;; (blamer-type 'visual)
-;;   (blamer-type 'posframe-popup)
-;;   ;; (blamer-type 'overlay-popup)
-;;   ;; (blamer--overlay-popup-position 'top)
-;;   ;; (blamer-type 'selected)
-;;   ;; (blamer-face ((t :foreground "#7a88cf"
-;;   ;;                   :background nil
-;;   ;;                   :height 100
-;;   ;;                   :italic t)))
+  (setq blamer-posframe-parameters
+        (list :parent-frame (selected-frame)
+              :internal-border-width 2
+              :internal-border-color "#7a88cf"
+              :poshandler 'posframe-poshandler-point-bottom-left-corner))
 
-;;   (blamer-show-avatar-p nil)
-;;   ;; (blamer-show-avatar-p t)
-;;   (blamer-max-commit-message-length 100)
 
-;;   ;; :custom-face
-;;   ;; (blamer-face ((t :foreground "#7a88cf"
-;;   ;;                  :background unspecified
-;;   ;;                  :height 100
-;;   ;;                  :italic t)))
-  
-;;   :hook (
-;;          (prog-mode . blamer-mode)
-;;          (text-mode . blamer-mode)
-;;          )
+  ;; 非同期実行
+  ;; (setq blamer-enable-async-execution-p t)
+  (setq blamer-enable-async-execution-p nil)
 
-;;   :config
-;;   ;; 自動表示タイマーが使う表示形式を確実に指定
-;;   ;; (setq blamer-type 'posframe-popup)
-
-;;   (setq blamer-posframe-parameters
-;;         '(:internal-border-width 2
-;;                                  :internal-border-color "#7a88cf"
-;;                                  :poshandler posframe-poshandler-p0.5-to-p0.5-top-center))
-
-;;   ;; 非同期実行
-;;   (setq blamer-enable-async-execution-p t)
-
-;;   (defun blamer--get-local-name (filename)
-;;     filename)
-
-;;   ;; (global-blamer-mode -1)
-;;   ;; (global-blamer-mode 1)
-;;   )
+  (defun blamer--get-local-name (filename)
+    filename)
+  )
 
 ;; recentf
 (use-package recentf
