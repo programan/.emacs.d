@@ -667,9 +667,11 @@
   :ensure t
   )
 
-;; (use-package rg
-;;   :ensure t
-;;   )
+(use-package rg
+  :ensure t
+  :config
+  (rg-enable-default-bindings))
+
 
 (use-package bash-completion
   :ensure t
@@ -906,7 +908,6 @@
          ;; the_silver_searcherかripgrepをOSにインストールしておく
          ;; ("C-c g" . counsel-ag)
          ("C-c g" . counsel-rg)
-         ;; ("C-c g" . counsel-rg)
          :map counsel-find-file-map
          ("C-l" . counsel-up-directory)
          )
@@ -1037,16 +1038,24 @@
   :config
   ;; (projectile-mode +1)
   ;; rgとかagとか
+  ;; (setq projectile-enable-caching nil)
   ;; (setq projectile-indexing-method 'alien)
-
-  ;; emacsの機能のみ
-  (setq projectile-indexing-method 'native)
-  (setq projectile-enable-caching t)
-  (setq projectile-refresh-cache-file-on-switch t)
 
   ;; Windows環境でのfindコマンド衝突を回避(scoopでfindutils,coreutils,diffutils入れてる前提)
   (when (eq system-type 'windows-nt)
-    (setq projectile-generic-command "find . -type f"))
+    (if (executable-find "rg")
+        (setq projectile-generic-command "rg --files --hidden --color never --path-separator /")
+        ;; (setq projectile-generic-command "rg --files --hidden --strip-cwd-prefix")
+      (setq projectile-generic-command "find . -type f")))
+
+
+  ;; emacsの機能のみ
+  ;; (setq projectile-indexing-method 'native)
+  ;; (setq projectile-enable-caching t)
+  ;; (setq projectile-refresh-cache-file-on-switch t)
+
+  ;; (when (eq system-type 'windows-nt)
+  ;;   (setq projectile-generic-command "find . -type f"))
 
   ; diredを開く
   ;; (setq projectile-switch-project-action 'projectile-dired)
@@ -2372,7 +2381,7 @@ setInterval(() => {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
- '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
- '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
+ '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))) t)
+ '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))) t)
+ '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))) t)
  '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
