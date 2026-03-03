@@ -3,6 +3,8 @@
 ;; Settings for macOS.
 ;;; Code:
 
+(message "Loading mac config....")
+
 ;; キーボードから入力される文字コード
 ;; (set-keyboard-coding-system 'sjis-mac)
 (set-keyboard-coding-system 'utf-8-mac)
@@ -120,5 +122,7 @@
   (setq plantuml-output-type "png")
 
   )
+
+(message "Loading mac config....done")
 
 ;;; init-macos.el ends here
