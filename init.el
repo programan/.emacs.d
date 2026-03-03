@@ -3,6 +3,11 @@
 ;; Settings for Emacs.
 ;;; Code:
 
+(defconst IS-WINDOWS (eq system-type 'windows-nt))
+(defconst IS-MAC     (eq system-type 'darwin))
+(defconst IS-LINUX (eq system-type 'gnu/linux))
+
+
 ;; 同名で拡張子がelcとelのファイルがあった場合、新しい方を読む
 ;; load時に拡張子まで指定されていた場合はこの限りではない
 (setq load-prefer-newer t)
@@ -304,11 +309,11 @@
 
 ;; 各OSに依存した設定
 (cond
-((eq system-type 'windows-nt)
+(IS-WINDOWS
  (load "~/.emacs.d/init-windows"))
- ((eq system-type 'darwin)
+ (IS-MAC
   (load "~/.emacs.d/init-macos"))
- ((eq system-type 'gnu/linux)
+ (IS-LINUX
   (load "~/.emacs.d/init-xwindow"))
  )
 
@@ -424,8 +429,81 @@
   ;; (dired-isearch-filenames t)
   ;; ファイルリストのオプション(ls -alh)
   (dired-listing-switches "-alh")
+  ;; ディレクトリを上にもってくる
+  ;; macの場合brew install coreutils でcoreutilsを入れておいてlsを最新にしておく
+  ;; (dired-listing-switches "-alh --group-directories-first")
+
+  ;; 圧縮・展開の設定（Mac/Linux/Windows共通で動作）
+  (dired-compress-file-suffixes
+   '(("\\.tar\\.gz\\'" "" "gzip -dc %i | tar -xf -")
+     ("\\.gz\\'" "" "gunzip")
+     ("\\.zip\\'" "" "unzip -o -d %o %i")
+     ("\\.7z\\'" "" "7z x -y -o%o %i")))
+
+  (dired-compress-files-alist
+   '(("\\.tar\\.gz\\'" . "tar -cf - %i | gzip -c9 > %o")
+     ("\\.zip\\'" . "zip -r %o %i")
+     ("\\.7z\\'" . "7z a %o %i")))
+
+  :config
+  (defun dired-open-external-app ()
+    "Diredでカーソル下のファイルをOS標準のアプリで開く"
+    (interactive)
+    (let* ((file (dired-get-filename nil t))
+           (command (cond
+                     (IS-WINDOWS "start")
+                     (IS-MAC     "open")
+                     (IS-LINUX   "xdg-open"))))
+      (if IS-WINDOWS
+          ;; Windowsのstartコマンドは特殊なのでshell-command経由が安定します
+          (shell-command (format "start \"\" %s" (shell-quote-argument file)))
+        (call-process command nil 0 nil file))))
+
+  ;; "E" キー（ExternalのE）に割り当てる例
+  (define-key dired-mode-map (kbd "E") 'dired-open-external-app)
+
+  (cond
+   ;; --- Windows環境 (Scoop) ---
+   (IS-WINDOWS
+    ;; 1. Emacsが自動で付与する "--dired" オプションをオフにする（エラー回避の肝）
+    (setq dired-use-ls-dired nil)
+
+    ;; 2. Scoopの coreutils があるか確認
+    (let ((ls-path (executable-find "ls")))
+      (if (and ls-path (string-match-p "scoop" ls-path))
+          (progn
+            (setq insert-directory-program ls-path)
+            (setq dired-listing-switches "-alh --group-directories-first -N"))
+        ;; Scoop版がない場合は Emacs 組み込みの ls-lisp を使う
+        (setq ls-lisp-use-insert-directory-program nil))))
+
+   ;; --- Mac環境 (Homebrew) ---
+   (IS-MAC
+    (let ((gls (executable-find "gls")))
+      (if gls
+          (progn
+            (setq insert-directory-program gls)
+            (setq dired-listing-switches "-alh --group-directories-first"))
+        (setq dired-listing-switches "-alh"))))
+
+   ;; --- Linux環境 ---
+   (IS-LINUX
+    (setq dired-listing-switches "-alh --group-directories-first")))
+
+  ;; 圧縮・展開の設定（ここは共通）
+  (setq dired-compress-file-suffixes
+        '(("\\.tar\\.gz\\'" "" "gzip -dc %i | tar -xf -")
+          ("\\.gz\\'" "" "gunzip")
+          ("\\.zip\\'" "" "unzip -o -d %o %i")
+          ("\\.7z\\'" "" "7z x -y -o%o %i")))
 )
 
+(use-package dired-narrow
+  :ensure t
+  ; /キーで絞り込み開始
+  :bind (:map dired-mode-map
+              ("/" . dired-narrow))
+  )
 
 (use-package anzu
   :ensure t
@@ -1021,15 +1099,6 @@
   :init
   (setq projectile-completion-system 'ivy)
 
-  ;; Windowsの場合scoopで入れているコマンドを使えるように
-  (when (eq system-type 'windows-nt)
-    (let ((scoop-shim-dir (expand-file-name "scoop/shims" (getenv "USERPROFILE"))))
-      (when (file-directory-p scoop-shim-dir)
-        ;; 1. Emacsが外部プロセスを起動する際のPATHの先頭に追加
-        (setenv "PATH" (concat scoop-shim-dir ";" (getenv "PATH")))
-        ;; 2. Emacs自身の実行ファイル検索パスの先頭に追加
-        (add-to-list 'exec-path scoop-shim-dir))))
-
   :bind-keymap (
                 ("s-p" . projectile-command-map)
                 ("C-c p" . projectile-command-map)
@@ -1042,7 +1111,7 @@
   ;; (setq projectile-indexing-method 'alien)
 
   ;; Windows環境でのfindコマンド衝突を回避(scoopでfindutils,coreutils,diffutils入れてる前提)
-  (when (eq system-type 'windows-nt)
+  (when IS-WINDOWS
     (if (executable-find "rg")
         (setq projectile-generic-command "rg --files --hidden --color never --path-separator /")
         ;; (setq projectile-generic-command "rg --files --hidden --strip-cwd-prefix")
@@ -1196,7 +1265,7 @@
   (treemacs-tag-follow-mode -1)
 
   (progn
-    (when (eq system-type 'windows-nt)
+    (when IS-WINDOWS
       (setq treemacs-python-executable (executable-find "python")))
 
     (when treemacs-python-executable

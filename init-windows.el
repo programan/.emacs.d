@@ -3,6 +3,8 @@
 ;; Settings for windows.
 ;;; Code:
 
+(message "Loading windows config....")
+
 ;キーボードから入力される文字コード
 (set-keyboard-coding-system 'sjis)
 
@@ -15,6 +17,16 @@
 ;クリップボードの文字コード
 ;; MS Windows clipboard
 (set-clipboard-coding-system 'utf-16le-dos)
+
+;; scoopのパス設定
+;; scoopでcoreutils,diffutils,findutils,ripgrep,ag,universal-ctags,git入れておく
+(let ((scoop-shim-dir (expand-file-name "scoop/shims" (getenv "USERPROFILE"))))
+  (when (file-directory-p scoop-shim-dir)
+    ;; Emacsが外部プロセスを起動する際のPATHの先頭に追加
+    (setenv "PATH" (concat scoop-shim-dir ";" (getenv "PATH")))
+    ;; Emacs自身の実行ファイル検索パスの先頭に追加
+    (add-to-list 'exec-path scoop-shim-dir))
+  )
 
 ;; MS-Windows shell-mode
 (add-hook
@@ -156,5 +168,6 @@
   )
 
 
+(message "Loading windows config....done")
 
 ;;; init-windows.el ends here
