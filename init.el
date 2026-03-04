@@ -473,38 +473,102 @@
   ;; (dired-listing-switches "-alh --group-directories-first")
 
   ;; 圧縮・展開の設定（Mac/Linux/Windows共通で動作）
-  (dired-compress-file-suffixes
-   '(("\\.tar\\.gz\\'" "" "gzip -dc %i | tar -xf -")
-     ("\\.gz\\'" "" "gunzip")
-     ("\\.zip\\'" "" "unzip -o -d %o %i")
-     ("\\.7z\\'" "" "7z x -y -o%o %i")))
+  ;; Z キーで解凍
+  ;; (dired-compress-file-suffixes
+  ;;  '(("\\.gz\\'" "" "7z x -y %i")
+  ;;    ("\\.tar\\.gz\\'" "" "7z x -y %i")
+  ;;    ("\\.zip\\'" "" "7z x -y %i")
+  ;;    ("\\.7z\\'" "" "7z x -y %i")))
 
-  (dired-compress-files-alist
-   '(("\\.tar\\.gz\\'" . "tar -cf - %i | gzip -c9 > %o")
-     ("\\.zip\\'" . "zip -r %o %i")
-     ("\\.7z\\'" . "7z a %o %i")))
+  ;; c キーで圧縮
+  ;; (dired-compress-files-alist
+  ;;  '(("\\.tar\\.gz\\'" . "tar -czf %o %i")
+  ;;    ("\\.zip\\'" . "7z a -tzip %o %i")
+  ;;    ("\\.7z\\'" . "7z a %o %i")))
 
   :config
+  ;; --------------------------------
+  ;; 圧縮・展開設定
+  ;; --------------------------------
+ (with-eval-after-load 'dired-aux
+   ;; Z
+   (add-to-list 'dired-compress-file-suffixes
+                '("\\.zip\\'" "" "7z x -y %i"))
+
+   (add-to-list 'dired-compress-file-suffixes
+                '("\\.7z\\'" "" "7z x -y %i"))
+
+   (add-to-list 'dired-compress-file-suffixes
+                '("\\.tar\\.gz\\'" "" "7z x -y %i"))
+
+   (add-to-list 'dired-compress-file-suffixes
+                '("\\.gz\\'" "" "7z x -y %i"))
+
+   ;; c
+   (add-to-list 'dired-compress-files-alist
+                '("\\.zip\\'" . "7z a -tzip %o %i"))
+
+   (add-to-list 'dired-compress-files-alist
+                '("\\.7z\\'" . "7z a %o %i"))
+
+   (add-to-list 'dired-compress-files-alist
+                '("\\.tar\\.gz\\'" . "tar -czf %o %i")))
+
+  ;; E で外部アプリで開く
   (defun dired-open-external-app ()
     "Diredでカーソル下のファイルをOS標準のアプリで開く"
     (interactive)
-    (let* ((file (dired-get-filename nil t))
-           (command (cond
-                     (IS-WINDOWS "start")
-                     (IS-MAC     "open")
-                     (IS-LINUX   "xdg-open"))))
-      (if IS-WINDOWS
-          ;; Windowsのstartコマンドは特殊なのでshell-command経由が安定します
-          (shell-command (format "start \"\" %s" (shell-quote-argument file)))
-        (call-process command nil 0 nil file))))
+    (let ((file (dired-get-filename nil t)))
+      (cond
+       (IS-WINDOWS
+        (w32-shell-execute "open" (expand-file-name file)))
+       (IS-MAC
+        (call-process "open" nil 0 nil file))
+       (IS-LINUX
+        (call-process "xdg-open" nil 0 nil file)))))
 
-  ;; "E" キー（ExternalのE）に割り当てる例
+  ;; Dired時に "E" キー（ExternalのE）に割り当てる
   (define-key dired-mode-map (kbd "E") 'dired-open-external-app)
+
+  ;; ----------------------------------------
+  ;; RETは拡張子で Emacs/外部 を自動切替
+  ;; ----------------------------------------
+  ;; 外部で開きたい拡張子リスト（必要に応じて追加/削除）
+  (defvar my/dired-open-externally-extensions
+    '("pdf" "xlsx" "xls" "docx" "doc" "pptx" "ppt"
+      "msg" "eml"
+      "mp4" "mov" "mkv")
+    "この拡張子はDiredでRETを押したら外部アプリで開く")
+
+  ;; FILEをOS既定アプリで開く
+  (defun my/dired-open-external (file)
+    "FILE を OS 既定アプリで開く。"
+    (cond
+     (IS-WINDOWS
+      (w32-shell-execute "open" (expand-file-name file)))
+     (IS-MAC
+      (call-process "open" nil 0 nil file))
+     (IS-LINUX
+      (call-process "xdg-open" nil 0 nil file))))
+
+  ;; RET用：拡張子が対象なら外部、そうでなければEmacsで開く
+  (defun my/dired-find-file-or-external ()
+    "拡張子に応じて Emacs で開くか OS既定アプリで開くか切り替える。"
+    (interactive)
+    (let* ((file (dired-get-file-for-visit))
+           (ext  (downcase (or (file-name-extension file) ""))))
+      (if (member ext my/dired-open-externally-extensions)
+          (my/dired-open-external file)
+        (dired-find-file))))
+
+  ;; RET を差し替え
+  (define-key dired-mode-map (kbd "RET") #'my/dired-find-file-or-external)
+
 
   (cond
    ;; --- Windows環境 (Scoop) ---
    (IS-WINDOWS
-    ;; 1. Emacsが自動で付与する "--dired" オプションをオフにする（エラー回避の肝）
+    ;; 1. Emacsが自動で付与する "--dired" オプションをオフにする
     (setq dired-use-ls-dired nil)
 
     ;; 2. Scoopの coreutils があるか確認
@@ -528,13 +592,6 @@
    ;; --- Linux環境 ---
    (IS-LINUX
     (setq dired-listing-switches "-alh --group-directories-first")))
-
-  ;; 圧縮・展開の設定（ここは共通）
-  (setq dired-compress-file-suffixes
-        '(("\\.tar\\.gz\\'" "" "gzip -dc %i | tar -xf -")
-          ("\\.gz\\'" "" "gunzip")
-          ("\\.zip\\'" "" "unzip -o -d %o %i")
-          ("\\.7z\\'" "" "7z x -y -o%o %i")))
 )
 
 (use-package dired-narrow
