@@ -195,20 +195,41 @@
      ;;              :underline "gray24"))
      ;; (:background nil
      ;;              :underline "RoyalBlue1"))
-     (:background unspecified
-                  :underline "dark slate blue"))
+
+     ;; (:background unspecified
+     ;;              :underline "dark slate blue"))
+
+     (:background "#1a1f2b"
+                  :underline "#2f3a52"))
 
     (((class color)
       (background light))
-     (:background "ForestGreen"))
+     ;; (:background "ForestGreen"))
+     (:background "#e5f3ff"))
     (t
      ()))
   "*Face used by hl-line.")
 
+(setq hl-line-sticky-flag t)
 (setq hl-line-face 'hlline-face)
 ;; (setq hl-line-face 'underline) ; 下線
 (global-hl-line-mode)
 
+(defun my/hl-line-extend-to-eol ()
+  "Extend hl-line face to the right edge by adding an after-string."
+  (when (and (boundp 'hl-line-overlay) (overlayp hl-line-overlay))
+    (let* ((win (selected-window))
+           (cols (window-body-width win))
+           (line-cols (save-excursion
+                        (goto-char (overlay-start hl-line-overlay))
+                        (goto-char (line-end-position))
+                        (current-column)))
+           (n (max 0 (- cols line-cols))))
+      (overlay-put hl-line-overlay
+                   'after-string
+                   (propertize (make-string n ?\s) 'face hl-line-face)))))
+
+(advice-add 'hl-line-highlight :after (lambda (&rest _) (my/hl-line-extend-to-eol)))
 
 
 ;; 右端で折り返さない
@@ -286,7 +307,16 @@
   (setq-local eww-disable-colorize nil)
   (eww-reload))
 ;; (setq eww-search-prefix "http://www.google.co.jp/search?q=")
-(setq eww-search-prefix "https://www.google.com/search?&gws_rd=cr&complete=0&pws=0&tbs=li:1&q=")
+;; (setq eww-search-prefix "https://www.google.com/search?&gws_rd=cr&complete=0&pws=0&tbs=li:1&q=")
+;; GoogleはJavaScriptが有効じゃないと無理になったのでやめる
+(setq eww-search-prefix "https://duckduckgo.com/html/?kl=jp-jp&q=")
+(add-hook 'eww-mode-hook
+          (lambda ()
+            (setq-local shr-use-fonts nil)
+            (setq-local shr-use-colors nil)
+            (setq-local shr-width 100)))
+(setq url-privacy-level 'high)
+
 
 ;; ショートカットキー設定
 ;; M-g で指定行へ移動
@@ -325,7 +355,11 @@
 ;; gitとかcvsとかの便利機能をemacsで使わないならオフ
 ;; ちなみにgitはmagitというlispがある。でもWindowsでは動かないかも
 ;; (remove-hook 'find-file-hooks 'vc-find-file-hook)
-(eval-after-load "vc" '(remove-hook 'find-file-hooks 'vc-find-file-hook))
+;; (eval-after-load "vc" '(remove-hook 'find-file-hooks 'vc-find-file-hook))
+;; 新しい書き方
+;; (setq vc-handled-backends nil)
+;; gitは使う
+(setq vc-handled-backends '(Git))
 
 
 ;; warn when opening files bigger than 200MB
@@ -342,7 +376,12 @@
 ;; デフォルトキーバインドを無効化
 (setq cua-enable-cua-keys nil)
 
-
+;; M-x my/color-preview RET  #444411など
+(defun my/color-preview (color)
+  (interactive "sColor: ")
+  (message "%s"
+           (propertize "       "
+                       'face `(:background ,color))))
 
 ;; packages
 
