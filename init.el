@@ -215,21 +215,21 @@
 ;; (setq hl-line-face 'underline) ; 下線
 (global-hl-line-mode)
 
-(defun my/hl-line-extend-to-eol ()
-  "Extend hl-line face to the right edge by adding an after-string."
-  (when (and (boundp 'hl-line-overlay) (overlayp hl-line-overlay))
-    (let* ((win (selected-window))
-           (cols (window-body-width win))
-           (line-cols (save-excursion
-                        (goto-char (overlay-start hl-line-overlay))
-                        (goto-char (line-end-position))
-                        (current-column)))
-           (n (max 0 (- cols line-cols))))
-      (overlay-put hl-line-overlay
-                   'after-string
-                   (propertize (make-string n ?\s) 'face hl-line-face)))))
+;; (defun my/hl-line-extend-to-eol ()
+;;   "Extend hl-line face to the right edge by adding an after-string."
+;;   (when (and (boundp 'hl-line-overlay) (overlayp hl-line-overlay))
+;;     (let* ((win (selected-window))
+;;            (cols (window-body-width win))
+;;            (line-cols (save-excursion
+;;                         (goto-char (overlay-start hl-line-overlay))
+;;                         (goto-char (line-end-position))
+;;                         (current-column)))
+;;            (n (max 0 (- cols line-cols))))
+;;       (overlay-put hl-line-overlay
+;;                    'after-string
+;;                    (propertize (make-string n ?\s) 'face hl-line-face)))))
 
-(advice-add 'hl-line-highlight :after (lambda (&rest _) (my/hl-line-extend-to-eol)))
+;; (advice-add 'hl-line-highlight :after (lambda (&rest _) (my/hl-line-extend-to-eol)))
 
 
 ;; 右端で折り返さない
@@ -777,6 +777,9 @@
   :ensure t
   :config
   (require 'vlf-setup)
+  :custom
+  ;; 2MByte単位で読む
+  (vlf-batch-size (* 2 1024 1024))
   )
 
 
@@ -1145,25 +1148,28 @@
 
   :config
   ;; (projectile-mode +1)
-  ;; rgとかagとか
-  ;; (setq projectile-enable-caching nil)
-  ;; (setq projectile-indexing-method 'alien)
 
   ;; Windows環境でのfindコマンド衝突を回避(scoopでfindutils,coreutils,diffutils入れてる前提)
   (when IS-WINDOWS
     (if (executable-find "rg")
-        (setq projectile-generic-command "rg --files --hidden --color never --path-separator /")
+        ;; (setq projectile-generic-command
+        ;;       "rg --files --hidden --color never --path-separator / --glob '!vendor/**' --glob '!node_modules/**' --glob '!.git/**' --glob '!storage/**' | tr -d '\\r'")
+
+        (setq projectile-generic-command
+              "rg --files --hidden --color never  --glob '!vendor/**' --glob '!node_modules/**' --glob '!.git/**' --glob '!storage/**' | tr -d '\\r'")
+
         ;; (setq projectile-generic-command "rg --files --hidden --strip-cwd-prefix")
       (setq projectile-generic-command "find . -type f")))
 
+  ;; (setq projectile-enable-caching nil)
+  (setq projectile-enable-caching t)
+
+  ;; rgとかagとか
+  ;; (setq projectile-indexing-method 'alien)
 
   ;; emacsの機能のみ
-  ;; (setq projectile-indexing-method 'native)
-  ;; (setq projectile-enable-caching t)
+  (setq projectile-indexing-method 'native)
   ;; (setq projectile-refresh-cache-file-on-switch t)
-
-  ;; (when (eq system-type 'windows-nt)
-  ;;   (setq projectile-generic-command "find . -type f"))
 
   ; diredを開く
   ;; (setq projectile-switch-project-action 'projectile-dired)
@@ -1445,12 +1451,18 @@
   ;; (global-flycheck-mode t)
   )
 
-(use-package flycheck-pos-tip
+;; (use-package flycheck-pos-tip
+;;   :ensure t
+;;   :defer t
+;;   :after (flycheck)
+;;   :config
+;;   (flycheck-pos-tip-mode))
+
+(use-package flycheck-posframe
   :ensure t
   :defer t
   :after (flycheck)
-  :config
-  (flycheck-pos-tip-mode))
+  :hook (flycheck-mode . flycheck-posframe-mode))
 
 
 (use-package flycheck-phpstan
@@ -1709,7 +1721,12 @@
 
 (use-package php-cs-fixer
   :ensure t
-  )
+  :after php-mode
+ ;; :hook
+ ;; 保存時にそのバッファだけ整形
+ ;; (php-mode . (lambda ()
+ ;;               (add-hook 'before-save-hook #'php-cs-fixer-before-save nil t)))
+ )
 
 (use-package php-mode
   :ensure t
@@ -1732,6 +1749,8 @@
          ;; M-fなどの単語単位の移動をキャメルケース単位にする
          (php-mode . subword-mode)
          ;; (php-mode . my-php-flycheck-setup)
+         (php-mode . (lambda ()
+                       (add-hook 'before-save-hook #'php-cs-fixer-before-save nil t)))
          )
   :config
   ;; (add-to-list 'company-backends 'company-php)
@@ -2232,6 +2251,9 @@ setInterval(() => {
                  "[/\\\\]\\.mypy_cache$"
                  "[/\\\\]__pycache__$"
                  "[/\\\\]\\.node_modules$"
+                 "[/\\\\]vendor$"
+                 "[/\\\\]node_modules$"
+                 "[/\\\\]\\.git$"
                  ))
     (push dir lsp-file-watch-ignored))
   )
@@ -2489,7 +2511,7 @@ setInterval(() => {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))) t)
- '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))) t)
- '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))) t)
+ '(git-gutter:added ((t (:foreground "DarkCyan" :background "gray2"))))
+ '(git-gutter:deleted ((t (:foreground "DeepPink" :background "gray2"))))
+ '(git-gutter:modified ((t (:foreground "DarkGoldenrod" :background "gray2"))))
  '(highlight-indent-guides-character-face ((t (:foreground "DarkSlateBlue"))) t))
