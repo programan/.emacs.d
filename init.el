@@ -472,25 +472,11 @@
   ;; macの場合brew install coreutils でcoreutilsを入れておいてlsを最新にしておく
   ;; (dired-listing-switches "-alh --group-directories-first")
 
-  ;; 圧縮・展開の設定（Mac/Linux/Windows共通で動作）
-  ;; Z キーで解凍
-  ;; (dired-compress-file-suffixes
-  ;;  '(("\\.gz\\'" "" "7z x -y %i")
-  ;;    ("\\.tar\\.gz\\'" "" "7z x -y %i")
-  ;;    ("\\.zip\\'" "" "7z x -y %i")
-  ;;    ("\\.7z\\'" "" "7z x -y %i")))
-
-  ;; c キーで圧縮
-  ;; (dired-compress-files-alist
-  ;;  '(("\\.tar\\.gz\\'" . "tar -czf %o %i")
-  ;;    ("\\.zip\\'" . "7z a -tzip %o %i")
-  ;;    ("\\.7z\\'" . "7z a %o %i")))
-
   :config
   ;; --------------------------------
   ;; 圧縮・展開設定
   ;; --------------------------------
- (with-eval-after-load 'dired-aux
+  (with-eval-after-load 'dired-aux
    ;; Z
    (add-to-list 'dired-compress-file-suffixes
                 '("\\.zip\\'" "" "7z x -y %i"))
@@ -1169,6 +1155,11 @@
   (ivy-mode 1)
   )
 
+(use-package ivy-rich
+  :ensure t
+  :after ivy
+  :config
+  (ivy-rich-mode 1))
 
 (use-package ivy-hydra
   :ensure t
@@ -1184,6 +1175,11 @@
   :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
   )
 
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :after (ivy-rich all-the-icons all-the-icons-ivy)
+  :config
+  (all-the-icons-ivy-rich-mode 1))
 
 (use-package smex
   :ensure t
