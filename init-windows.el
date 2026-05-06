@@ -168,6 +168,8 @@
   )
 
 
+(setq package-gnupghome-dir nil)
+
 (message "Loading windows config....done")
 
 ;;; init-windows.el ends here

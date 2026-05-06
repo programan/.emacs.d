@@ -2546,6 +2546,7 @@ setInterval(() => {
  ;; If there is more than one, they won't work right.
  '(ctags-command "ctags -R -e" t)
  '(display-line-numbers-width-start t)
+ '(lsp-completion-enable t nil nil "Customized with use-package lsp-mode")
  '(mouse-wheel-follow-mouse t)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(5 ((shift) . 1)))
