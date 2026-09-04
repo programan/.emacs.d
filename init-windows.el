@@ -1,4 +1,4 @@
-;;; init-windows.el --- init-windows.el
+;;; init-windows.el --- init-windows.el  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;; Settings for windows.
 ;;; Code:

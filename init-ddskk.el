@@ -1,4 +1,4 @@
-;;; init-ddskk.el --- init-ddskk.el
+;;; init-ddskk.el --- init-ddskk.el  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;; Settings for skk.
 ;;; Code:
