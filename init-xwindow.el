@@ -1,4 +1,4 @@
-;;; init-xwindow.el --- init-xwindow.el
+;;; init-xwindow.el --- init-xwindow.el  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;; Settings for xwindow.
 ;;; Code:
