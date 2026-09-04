@@ -1843,7 +1843,7 @@
   (markdown-enable-math t)
   (markdown-xhtml-body-preamble "<div class=\"markdown-body\">")
   (markdown-xhtml-body-epilogue "</div>")
-  (markdown-content-type "application/xhtml+xml")
+  (markdown-content-type "text/html")
   ;; (markdown-content-type "application/html")
   (markdown-css-paths '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
                         "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css"))
@@ -1861,7 +1861,7 @@
   padding: 0 10px;
 }
 /*印刷時の改行コード*/
-body>h1:not(:first-of-type) {
+.markdown-body > h1:not(:first-of-type) {
   page-break-before: always;
 }
 h2 {
@@ -1918,6 +1918,28 @@ MathJax = {
 };
 </script>
 <script type='text/javascript' id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+
+<script type='module'>
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+mermaid.initialize({
+  startOnLoad: false,
+  securityLevel: 'strict'
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+  document.querySelectorAll('pre > code.language-mermaid').forEach((code) => {
+    const div = document.createElement('div');
+    div.className = 'mermaid';
+    div.textContent = code.textContent;
+    code.parentElement.replaceWith(div);
+  });
+
+  await mermaid.run({
+    querySelector: '.mermaid'
+  });
+});
+</script>
 "
    ))
 
