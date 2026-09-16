@@ -16,28 +16,21 @@
 ;; Emacs24から標準搭載されたパッケージマネージャの設定
 ;; package.elの設定
 (when (require 'package nil t)
-  (setq package-user-dir "~/.emacs.d/elpa/")
+  (setq package-user-dir
+        (expand-file-name "elpa/" user-emacs-directory))
 
-  ;;パッケージリポジトリにMarmaladeと開発運営のELPAを追加
-  (add-to-list 'package-archives
-               '("gnu" . "http://elpa.gnu.org/packages/"))
-  ;; (add-to-list 'package-archives
-  ;;              '("marmalade" . "http://marmalade-repo.org/packages/"))
-  (add-to-list 'package-archives
-               '("melpa" . "http://melpa.org/packages/"))
-  (add-to-list 'package-archives
-               '("melpa-stable" . "http://stable.melpa.org/packages/"))
-  (add-to-list 'package-archives
-               '("ELPA" . "http://tromey.com/elpa/"))
-  (add-to-list 'package-archives
-               '("org" . "http://orgmode.org/elpa/"))
+  ;;パッケージリポジトリを追加
+  (setq package-archives
+        '(("gnu"    . "https://elpa.gnu.org/packages/")
+          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+          ("melpa"  . "https://melpa.org/packages/")))
+
   ;;インストールしたパッケージにロードパスを通して読み込む
   (package-initialize)
 
   ;;パッケージ情報を更新
-  (unless package-archive-contents (package-refresh-contents))
   (unless (package-installed-p 'use-package)
-    ;; use-packageのインストール
+    (package-refresh-contents)
     (package-install 'use-package))
 
   (setq use-package-enable-imenu-support t)
@@ -88,18 +81,24 @@
 (column-number-mode 1)
 
 
-;; バックアップとオートセーブファイルを~/.emacs.d/backups/へ集める
-(add-to-list 'backup-directory-alist (cons "." "~/.emacs.d/backup/"))
-(setq auto-save-file-name-transforms
-      `((".*" ,(expand-file-name "~/.emacs.d/backup/") t)))
+;; バックアップとオートセーブファイルをbackups/へ集める
+(let ((backup-dir (expand-file-name "backup/" user-emacs-directory)))
+  (unless (file-directory-p backup-dir)
+    (make-directory backup-dir t))
 
+  (add-to-list
+   'backup-directory-alist
+   `("." . ,backup-dir))
+
+  (setq auto-save-file-name-transforms
+        `((".*" ,backup-dir t))))
 
 ;; 行番号表示
 (when (version<= "26.0.50" emacs-version )
   ;; (global-display-line-numbers-mode 1)
   ;; 最初から幅を確保
-  (custom-set-variables '(display-line-numbers-width-start t))
-  
+  (setopt display-line-numbers-width-start t)
+
   ;; 行番号エリアの色
   ;; (set-face-attribute 'line-number nil
   ;;                     :foreground "ivory4"
@@ -339,12 +338,12 @@
 
 ;; 各OSに依存した設定
 (cond
-(IS-WINDOWS
- (load "~/.emacs.d/init-windows"))
+ (IS-WINDOWS
+  (load (expand-file-name "init-windows" user-emacs-directory)))
  (IS-MAC
-  (load "~/.emacs.d/init-macos"))
+  (load (expand-file-name "init-macos" user-emacs-directory)))
  (IS-LINUX
-  (load "~/.emacs.d/init-xwindow"))
+  (load (expand-file-name "init-xwindow" user-emacs-directory)))
  )
 
 
@@ -363,9 +362,9 @@
 
 
 ;; warn when opening files bigger than 200MB
-(setq large-file-warning-threshold 200000000)
-;; gc 12MB
-(setq gc-cons-threshold 12000000)
+(setq large-file-warning-threshold (* 200 1024 1024))
+;; gc 32MB
+(setq gc-cons-threshold (* 32 1024 1024))
 
 
 ;;(remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
@@ -848,9 +847,8 @@
   :ensure t
   :bind (("C-x j" . skk-mode))
   :init
-  ;; (setq skk-byte-compile-init-file t
-  ;;       skk-init-file "~/.emacs.d/init-ddskk")
-  (setq skk-init-file "~/.emacs.d/init-ddskk")
+  (setq skk-init-file
+        (expand-file-name "init-ddskk" user-emacs-directory))
 
   :custom
   (skk-user-directory "~/.ddskk")
@@ -1004,7 +1002,7 @@
 (use-package recentf
   :custom
   (recentf-max-saved-items 1000)
-  (recentf-save-file "~/.emacs.d/recentf")
+  (recentf-save-file (expand-file-name "recentf" user-emacs-directory))
   (recentf-exclude '("recentf" "/TAGS$" "/var/tmp/"))
   ;; (recentf-auto-cleanup 30)
   (recentf-auto-cleanup 'never)
@@ -1482,8 +1480,7 @@
          )
   :custom
   (yas-snippet-dirs
-   '("~/.emacs.d/yasnippets/snippets")
-   )
+   (list (expand-file-name "yasnippets/snippets" user-emacs-directory)))
   :init
   (yas-global-mode 1))
 
@@ -1745,9 +1742,11 @@
   )
 
 
+(add-to-list 'load-path
+             (expand-file-name "site-lisp" user-emacs-directory))
 (use-package ruby-block
   ;; :ensure t
-  :load-path "~/.emacs.d/site-lisp/"
+  ;; :load-path (expand-file-name "site-lisp" user-emacs-directory)
   :after (ruby-mode)
   :diminish ruby-block-mode
   :hook
