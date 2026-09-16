@@ -1073,15 +1073,6 @@
   (counsel-mode 1)
   )
 
-(use-package counsel-etags
-  :ensure t
-  :disabled t
-  :bind ("M-." . counsel-etags-find-tag-at-point)
-  :config
-  ;; 保存時に自動でctagsを更新する設定（任意）
-  ;; (add-hook 'after-save-hook 'counsel-etags-virtual-update-tags)
-  ;; 大きすぎるファイル（1MB以上など）を無視して高速化
-  (setq counsel-etags-max-file-size 1024))
 
 (use-package swiper
   :ensure t
@@ -1275,33 +1266,6 @@
   (global-undo-tree-mode t))
 
 
-(use-package neotree
-  :disabled t
-  :ensure t
-  :defer t
-  :after (all-the-icons)
-  :bind (
-         ([f8] . neotree-toggle)
-         )
-
-  :custom
-  ;; Press '?' for neotree help.
-  ;; 隠しファイルをデフォルトで表示
-  (neo-show-hidden-files t)
-  ;; キーバインドをシンプルにする
-  (neo-keymap-style 'concise)
-  ;; neotree ウィンドウを表示する毎に current file のあるディレクトリを表示する
-  (neo-smart-open t)
-
-  (neo-theme (if (display-graphic-p) 'icons 'arrow))
-
-  (neo-window-fixed-size nil)
-  (neo-window-width 40)
-  (neo-autorefresh t)
-  )
-
-
-
 ;; Cc Cw r  ワークスペースの名前を変更します
 ;; Cc Cw a  新しいワークスペースを作成します
 ;; Cc Cw d  ワークスペースを削除します
@@ -1388,10 +1352,6 @@
   :mode
   ("Dockerfile\\'" . dockerfile-mode))
 
-(use-package company-php
-  :ensure t
-  ;; :after (company)
-  )
 
 (use-package company
   :ensure t
@@ -1440,19 +1400,14 @@
               '(:with company-yasnippet))))
 
   ;; (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-  (setq company-backends (mapcar #'company-mode/backend-with-yas
-                                 '(company-bbdb
-                                   ;; company-eclim
-                                   company-semantic
-                                   company-clang
-                                   ;; company-xcode
-                                   company-cmake
-                                   company-files
-                                   (company-dabbrev-code
-                                    company-gtags
-                                    company-etags
-                                    company-keywords)
-                                   company-oddmuse company-dabbrev company-capf company-ac-php-backend)))
+  (setq company-backends
+        (mapcar #'company-mode/backend-with-yas
+                '(company-capf
+                  company-files
+                  (company-dabbrev-code
+                   company-etags
+                   company-keywords)
+                  company-dabbrev)))
   )
 
 
@@ -1802,7 +1757,6 @@
                        (add-hook 'before-save-hook #'php-cs-fixer-before-save nil t)))
          )
   :config
-  ;; (add-to-list 'company-backends 'company-php)
   ;; 保存時に実行
   ;; php-cs-fixerが古くて.php-cs-fixer.dist.phpを認識しないかも
   ;; (add-hook 'before-save-hook 'php-cs-fixer-before-save)
@@ -2083,15 +2037,6 @@ setInterval(() => {
   ;;   (setq time-stamp-end "$")
   ;;   )
   ;; (add-hook 'web-mode-hook  'my-web-mode-hook)
-  )
-
-
-(use-package auto-complete
-  :ensure t
-  :defer t
-  :config
-  ;; (ac-config-default)
-  (ac-linum-workaround)
   )
 
 
