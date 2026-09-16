@@ -94,21 +94,19 @@
         `((".*" ,backup-dir t))))
 
 ;; 行番号表示
-(when (version<= "26.0.50" emacs-version )
-  ;; (global-display-line-numbers-mode 1)
-  ;; 最初から幅を確保
-  (setopt display-line-numbers-width-start t)
+;; 最初から幅を確保
+(setopt display-line-numbers-width-start t)
 
-  ;; 行番号エリアの色
-  ;; (set-face-attribute 'line-number nil
-  ;;                     :foreground "ivory4"
-  ;;                     :background "gray1")
-  ;; (set-face-attribute 'line-number-current-line nil
-  ;;                     :foreground "turquoise3")
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-  (add-hook 'text-mode-hook 'display-line-numbers-mode)
-  (add-hook 'conf-mode-hook 'display-line-numbers-mode)
-  )
+;; 行番号エリアの色
+;; (set-face-attribute 'line-number nil
+;;                     :foreground "ivory4"
+;;                     :background "gray1")
+;; (set-face-attribute 'line-number-current-line nil
+;;                     :foreground "turquoise3")
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(add-hook 'text-mode-hook 'display-line-numbers-mode)
+(add-hook 'conf-mode-hook 'display-line-numbers-mode)
+
 
 ;; ファイルの終端をフリンジを使い判り易くする
 (setq-default indicate-empty-lines t)
@@ -128,14 +126,13 @@
 
 
 ;; Emacs24から標準になったelectric系の機能を有効にする
-(when (>= emacs-major-version 24)
-  ;; 自動で閉じカッコを入れる
-  ;;(electric-pair-mode t)
-  ;; 改行時にインデント
-  (electric-indent-mode t)
-  ;; 自動で改行
-  ; (electric-layout-mode t)
-  )
+;; 自動で閉じカッコを入れる
+;;(electric-pair-mode t)
+;; 改行時にインデント
+(electric-indent-mode t)
+;; 自動で改行
+; (electric-layout-mode t)
+
 
 ;; electricをemacs全体で有効にしたくない場合は
 ;; add-hookで個別に設定する
@@ -2324,7 +2321,6 @@ setInterval(() => {
                  "[/\\\\]\\.venv$"
                  "[/\\\\]\\.mypy_cache$"
                  "[/\\\\]__pycache__$"
-                 "[/\\\\]\\.node_modules$"
                  "[/\\\\]vendor$"
                  "[/\\\\]node_modules$"
                  "[/\\\\]\\.git$"
@@ -2548,16 +2544,6 @@ setInterval(() => {
          )
   )
 
-(use-package geben
-  :disabled t
-  ;; :pin melpa
-  ;; package-list-packagesでインストールしないと失敗する
-  ;; :ensure t
-  ;; M-x geben
-  ;; portとか変えたい場合は
-  ;; C-u M-x geben
-  )
-
 ;;; init.el ends here
 
 (custom-set-variables
@@ -2566,7 +2552,6 @@ setInterval(() => {
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ctags-command "ctags -R -e" t)
- '(display-line-numbers-width-start t)
  '(lsp-completion-enable t nil nil "Customized with use-package lsp-mode")
  '(mouse-wheel-follow-mouse t)
  '(mouse-wheel-progressive-speed nil)
