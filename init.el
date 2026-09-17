@@ -1723,14 +1723,14 @@
   )
 
 
-(use-package php-cs-fixer
-  :ensure t
-  :after php-mode
- ;; :hook
- ;; 保存時にそのバッファだけ整形
- ;; (php-mode . (lambda ()
- ;;               (add-hook 'before-save-hook #'php-cs-fixer-before-save nil t)))
- )
+;; (use-package php-cs-fixer
+;;   :ensure t
+;;   :after php-mode
+;;  ;; :hook
+;;  ;; 保存時にそのバッファだけ整形
+;;  ;; (php-mode . (lambda ()
+;;  ;;               (add-hook 'before-save-hook #'php-cs-fixer-before-save nil t)))
+;;  )
 
 (use-package php-mode
   :ensure t
@@ -1753,8 +1753,8 @@
          ;; M-fなどの単語単位の移動をキャメルケース単位にする
          (php-mode . subword-mode)
          ;; (php-mode . my-php-flycheck-setup)
-         (php-mode . (lambda ()
-                       (add-hook 'before-save-hook #'php-cs-fixer-before-save nil t)))
+         ;; (php-mode . (lambda ()
+         ;;               (add-hook 'before-save-hook #'php-cs-fixer-before-save nil t)))
          )
   :config
   ;; 保存時に実行
